@@ -44,8 +44,6 @@ app.use(function (err, req, res, next) {
     res.render('error');
 });
 
-app.listen(process.env.API_PORT, function () {
-    console.log('Listening on: ', process.env.API_PORT)
-});
+app.listen(4040);
 
 module.exports = app;
