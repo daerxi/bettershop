@@ -13,6 +13,7 @@ module.exports = (sequelize, type) => {
         // 1 as business, 0 as normal user
         isBusiness:  type.BOOLEAN,
         avatar: type.STRING,
-        resetToken: type.STRING
+        resetToken: type.STRING,
+        password: type.STRING
     });
 }

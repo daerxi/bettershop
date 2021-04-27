@@ -44,7 +44,7 @@ router.post('/', async (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
-    universalLogin(login, req, res);
+    return await login(req.body.email, req.body.password, res);
 });
 
 module.exports = router;

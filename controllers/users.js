@@ -17,6 +17,7 @@ const login = async (email, rawPassword, res) => {
     await findUserByEmail(email).then(async user => {
         if (user) {
             user = user.dataValues;
+            console.log(rawPassword, user);
             if (bcrypt.compareSync(rawPassword, user.password)) {
                 const token = signToken(user.id);
                 await findTokenByUserId(user.id).then(async userToken => {
