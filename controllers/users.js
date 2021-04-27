@@ -25,7 +25,7 @@ const login = async (email, rawPassword, res) => {
                     res.status(201).json(loginInfo);
                 });
             } else res.status(401).json({error: "invalid password"});
-        } else res.status(404).json({error: "user_not_found"});
+        } else res.status(404).json({error: "user not found"});
     });
 }
 
