@@ -25,8 +25,8 @@ const login = async (email, rawPassword, res) => {
                     const loginInfo = await createToken(user.id, token);
                     res.status(201).json(loginInfo);
                 });
-            } else res.status(401).json({error: "invalid password"});
-        } else res.status(404).json({error: "user not found"});
+            } else res.status(401).json({error: "Your password is not correct."});
+        } else res.status(404).json({error: "Account does not exist."});
     });
 }
 
