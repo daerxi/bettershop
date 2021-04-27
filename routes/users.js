@@ -1,8 +1,8 @@
 const express = require('express');
-const {checkToken, isNullOrEmpty, universalLogin} = require("../common/lib");
+const {universalLogin} = require("../controllers/auth");
 const {User} = require("../sync");
-const {createUser, login} = require("../common/users");
-
+const {createUser, login} = require("../controllers/users");
+const {isNullOrEmpty} = require("../common/utils");
 const router = express.Router();
 
 router.get('/', function (req, res, next) {

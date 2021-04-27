@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt");
-const {signToken} = require("./lib");
+const {signToken} = require("./auth");
 const {Business, BusinessToken} = require("../sync");
 
 const createBusiness = async (name, email, rawPassword) => {

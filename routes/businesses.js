@@ -1,7 +1,8 @@
 const express = require('express');
-const {universalLogin, isNullOrEmpty, checkBusinessToken} = require("../common/lib");
-const {login, createBusiness} = require("../common/businesses");
+const {universalLogin, checkBusinessToken} = require("../controllers/auth");
+const {login, createBusiness} = require("../controllers/businesses");
 const {Business} = require("../sync");
+const {isNullOrEmpty} = require("../common/utils");
 
 const router = express.Router();
 

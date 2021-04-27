@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt");
-const {signToken} = require("./lib");
+const {signToken} = require("./auth");
 const {User, UserToken} = require("../sync");
 
 const createUser = async (firstName, lastName, email, rawPassword) => {

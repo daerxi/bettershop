@@ -66,14 +66,9 @@ const universalLogin = (login, req, res) => {
     }
 }
 
-const isNullOrEmpty = (obj) => {
-    return !obj || !obj.trim()
-}
-
 module.exports = {
     checkToken,
     checkBusinessToken,
     signToken,
-    universalLogin,
-    isNullOrEmpty
+    universalLogin
 }
