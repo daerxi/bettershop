@@ -9,28 +9,23 @@ module.exports = (sequelize, type) => {
             type: type.STRING,
             allowNull: false
         },
-        email: {
-            type: type.STRING,
-            unique: true,
-            allowNull: false
-        },
-        password: {
-            type: type.STRING,
-            allowNull: false
-        },
-        resetToken: type.STRING,
-        phone: type.INTEGER,
         category: type.STRING,
-        country: type.STRING,
-        province: type.STRING,
-        city: type.STRING,
-        address: type.STRING,
         website: type.STRING,
-        logo: type.STRING,
         description: type.STRING,
         clicktrack: {
             type: type.INTEGER,
             defaultValue: 0
-        }
+        },
+        userId: {
+            type: type.INTEGER,
+            references: {
+                model: 'users',
+                key: 'id'
+            }
+        },
+        country: type.STRING,
+        province: type.STRING,
+        city: type.STRING,
+        address: type.STRING
     });
 }

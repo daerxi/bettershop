@@ -2,6 +2,7 @@ const express = require('express');
 const {universalLogin} = require("../controllers/auth");
 const {User} = require("../sync");
 const {createUser, login} = require("../controllers/users");
+const {createBusiness} = require("../controllers/businesses");
 const {isNullOrEmpty} = require("../common/utils");
 const router = express.Router();
 
@@ -21,11 +22,16 @@ router.post('/', async (req, res) => {
         const rawPassword = req.body.password;
         const firstName = req.body.firstName;
         const lastName = req.body.lastName;
+        const isBusiness = req.body.isBusiness;
         if (isNullOrEmpty(email) || isNullOrEmpty(rawPassword) || isNullOrEmpty(firstName) || isNullOrEmpty(lastName))
             throw "required field cannot be empty";
+        else if (isBusiness && isNullOrEmpty(req.body.name))
+            throw "name is required as a business account";
         else {
-            await createUser(firstName.trim(), lastName.trim(), email.toLowerCase().trim(), rawPassword.trim()).then(async user => {
+            await createUser(firstName.trim(), lastName.trim(), email.toLowerCase().trim(), rawPassword.trim(), isBusiness).then(async user => {
                 if (user) {
+                    // business account
+                    if (isBusiness) await createBusiness(req.body.name.trim(), user.id);
                     delete user["dataValues"].password;
                     res.status(201).send(user);
                 } else res.status(400).json({error: "unknown reason"});

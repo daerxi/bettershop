@@ -1,5 +1,5 @@
 const isNullOrEmpty = (obj) => {
-    return !obj || !obj.trim() || obj.trim() !== '';
+    return !obj || !obj.trim();
 }
 
 module.exports = {

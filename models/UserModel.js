@@ -5,29 +5,14 @@ module.exports = (sequelize, type) => {
             primaryKey: true,
             autoIncrement: true
         },
-        firstName: {
-            type: type.STRING,
-            allowNull: false
-        },
-        lastName: {
-            type: type.STRING,
-            allowNull: false
-        },
         email: {
             type: type.STRING,
             unique: true,
             allowNull: false
         },
-        password: {
-            type: type.STRING,
-            allowNull: false
-        },
-        resetToken: type.STRING,
-        age: type.INTEGER,
-        gender: type.STRING,
-        country: type.STRING,
-        province: type.STRING,
-        city: type.STRING,
-        profilePhoto: type.STRING
+        // 1 as business, 0 as normal user
+        isBusiness:  type.BOOLEAN,
+        avatar: type.STRING,
+        resetToken: type.STRING
     });
 }

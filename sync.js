@@ -2,7 +2,6 @@ const Sequelize = require('sequelize');
 const UserModel = require('./models/UserModel');
 const UserTokenModel = require('./models/UserTokenModel');
 const BusinessModel = require('./models/BusinessModel');
-const BusinessTokenModel = require('./models/BusinessTokenModel');
 const ReviewModel = require('./models/ReviewModel');
 const ReplyModel = require('./models/ReplyModel');
 const WishListModel = require('./models/WishListModel');
@@ -29,7 +28,6 @@ const db = new Sequelize(database, user, password, {
 const User = UserModel(db, Sequelize);
 const UserToken = UserTokenModel(db, Sequelize);
 const Business = BusinessModel(db, Sequelize);
-const BusinessToken = BusinessTokenModel(db, Sequelize);
 const Review = ReviewModel(db, Sequelize);
 const Reply = ReplyModel(db, Sequelize);
 const WishList = WishListModel(db, Sequelize);
@@ -42,7 +40,6 @@ module.exports = {
     User,
     UserToken,
     Business,
-    BusinessToken,
     Review,
     Reply,
     WishList

@@ -2,13 +2,14 @@ const bcrypt = require("bcrypt");
 const {signToken} = require("./auth");
 const {User, UserToken} = require("../sync");
 
-const createUser = async (firstName, lastName, email, rawPassword) => {
+const createUser = async (firstName, lastName, email, rawPassword, isBusiness) => {
     const password = bcrypt.hashSync(rawPassword, 10);
     return await User.create({
         firstName,
         lastName,
         email,
-        password
+        password,
+        isBusiness
     });
 }
 
