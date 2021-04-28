@@ -55,6 +55,15 @@ router.get('/me', checkToken, function (req, res, next) {
     });
 });
 
+router.get('/:id', checkToken, function (req, res, next) {
+    findUserByUserId(req.params.id).then(user => {
+        delete user["dataValues"].password;
+        delete user["dataValues"].lastName;
+        delete user["dataValues"].resetToken;
+        res.status(201).json(user);
+    });
+});
+
 router.delete('/logout', checkToken, async (req, res) => {
     const userId = decodeJWT(req.header.token).sub;
     await destroyToken(userId).then(async () => res.send(200))

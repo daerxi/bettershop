@@ -13,7 +13,7 @@ router.get('/', function(req, res, next) {
     }
 });
 
-router.post('/verify', function(req, res, next) {
+router.post('/:type', function(req, res, next) {
 
 });
 
