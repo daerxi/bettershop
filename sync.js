@@ -5,9 +5,11 @@ const BusinessModel = require('./models/BusinessModel');
 const ReviewModel = require('./models/ReviewModel');
 const ReplyModel = require('./models/ReplyModel');
 const WishListModel = require('./models/WishListModel');
+const CategoryModel = require('./models/CategoryModel');
 const mysql = require('mysql2/promise');
-
 const dotenv = require('dotenv');
+const fs = require('fs');
+
 const {config} = require("./common/config");
 dotenv.config();
 
@@ -31,6 +33,22 @@ const Business = BusinessModel(db, Sequelize);
 const Review = ReviewModel(db, Sequelize);
 const Reply = ReplyModel(db, Sequelize);
 const WishList = WishListModel(db, Sequelize);
+const Category = CategoryModel(db, Sequelize);
+
+fs.readFile('assets/category.json', (err, data) => {
+    if (err) throw err;
+    const categories = JSON.parse(data);
+    for (const category of categories) {
+        Category.findOne({
+            where: {
+                type: category
+            }
+        }).then(function (res) {
+            if (!res) Category.create({type: category});
+            else console.log("--------- category", category, "already inserted --------- ");
+        });
+    }
+});
 
 db.sync().then(() => {
     console.log('Synced Database successfully!');
@@ -42,6 +60,7 @@ module.exports = {
     Business,
     Review,
     Reply,
-    WishList
+    WishList,
+    Category
 };
 

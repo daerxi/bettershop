@@ -6,8 +6,4 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'BetterShop' });
 });
 
-router.post('/verify', function(req, res, next) {
-  
-});
-
 module.exports = router;

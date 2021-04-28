@@ -1,6 +1,7 @@
 const express = require('express');
+const {checkToken,decodeJWT} = require("../controllers/auth");
 const {User} = require("../sync");
-const {createUser, login} = require("../controllers/users");
+const {createUser, login, findUserByUserId} = require("../controllers/users");
 const {createBusiness} = require("../controllers/businesses");
 const {isNullOrEmpty} = require("../common/utils");
 const router = express.Router();
@@ -32,7 +33,7 @@ router.post('/', async (req, res) => {
                     // business account
                     if (isBusiness) await createBusiness(req.body.name.trim(), user.id);
                     delete user["dataValues"].password;
-                    res.status(201).send(user);
+                    res.status(201).json(user);
                 } else res.status(400).json({error: "Unknown reason."});
             });
         }
@@ -44,6 +45,14 @@ router.post('/', async (req, res) => {
 
 router.post('/login', async (req, res) => {
     return await login(req.body.email, req.body.password, res);
+});
+
+router.get('/me', checkToken, function(req, res, next) {
+    const userId = decodeJWT(req.header.token).sub;
+    findUserByUserId(userId).then(user => {
+        delete user["dataValues"].password;
+        res.status(201).json(user);
+    })
 });
 
 module.exports = router;

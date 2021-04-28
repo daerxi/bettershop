@@ -46,6 +46,14 @@ const findUserByEmail = async (email) => {
     });
 }
 
+const findUserByUserId = async (id) => {
+    return User.findOne({
+        where: {
+            id
+        }
+    });
+}
+
 const destroyToken = async (userId) => {
     return await UserToken.destroy({
         where: {
@@ -63,5 +71,6 @@ const createToken = async (userId, token) => {
 
 module.exports = {
     login,
-    createUser
+    createUser,
+    findUserByUserId
 }
