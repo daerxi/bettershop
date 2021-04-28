@@ -1,5 +1,5 @@
 const express = require('express');
-const {checkToken,decodeJWT} = require("../controllers/auth");
+const {checkToken, decodeJWT, deleteToken} = require("../controllers/auth");
 const {User} = require("../sync");
 const {createUser, login, findUserByUserId} = require("../controllers/users");
 const {createBusiness} = require("../controllers/businesses");
@@ -47,12 +47,17 @@ router.post('/login', async (req, res) => {
     return await login(req.body.email, req.body.password, res);
 });
 
-router.get('/me', checkToken, function(req, res, next) {
+router.get('/me', checkToken, function (req, res, next) {
     const userId = decodeJWT(req.header.token).sub;
     findUserByUserId(userId).then(user => {
         delete user["dataValues"].password;
         res.status(201).json(user);
-    })
+    });
+});
+
+router.delete('/logout', checkToken, async (req, res) => {
+    await deleteToken(req.header.token).then(async () => res.send(204))
+            .catch(e => { res.status(400).json({error: e}) });
 });
 
 module.exports = router;
