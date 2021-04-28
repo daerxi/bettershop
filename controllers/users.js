@@ -72,5 +72,6 @@ const createToken = async (userId, token) => {
 module.exports = {
     login,
     createUser,
+    destroyToken,
     findUserByUserId
 }

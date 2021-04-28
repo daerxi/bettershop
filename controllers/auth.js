@@ -10,14 +10,6 @@ function tokenResult(token, res, next) {
     }
 }
 
-const deleteToken = token => {
-    return UserToken.destroy({
-        where: {
-            token
-        }
-    })
-}
-
 const decodeJWT = token => {
     return JWT.decode(token, process.env.JWT_SECRET);
 }
@@ -57,6 +49,5 @@ const signToken = id => {
 module.exports = {
     checkToken,
     signToken,
-    decodeJWT,
-    deleteToken
+    decodeJWT
 }

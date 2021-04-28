@@ -1,7 +1,7 @@
 const express = require('express');
-const {checkToken, decodeJWT, deleteToken} = require("../controllers/auth");
+const {checkToken, decodeJWT} = require("../controllers/auth");
 const {User} = require("../sync");
-const {createUser, login, findUserByUserId} = require("../controllers/users");
+const {createUser, login, findUserByUserId, destroyToken} = require("../controllers/users");
 const {createBusiness} = require("../controllers/businesses");
 const {isNullOrEmpty} = require("../common/utils");
 const router = express.Router();
@@ -56,7 +56,8 @@ router.get('/me', checkToken, function (req, res, next) {
 });
 
 router.delete('/logout', checkToken, async (req, res) => {
-    await deleteToken(req.header.token).then(async () => res.send(204))
+    const userId = decodeJWT(req.header.token).sub;
+    await destroyToken(userId).then(async () => res.send(200))
             .catch(e => { res.status(400).json({error: e}) });
 });
 
