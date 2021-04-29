@@ -13,7 +13,7 @@ function randomString(length) {
 
 function deleteSensitiveInfo(user) {
     delete user["dataValues"].password;
-    delete user["dataValues"].resetToken;
+    delete user["dataValues"].verificationCode;
     return user;
 }
 
