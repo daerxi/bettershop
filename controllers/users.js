@@ -79,13 +79,21 @@ const findUserByVerificationCode = async (verificationCode) => {
     })
 }
 
-const updatePassword = async (password) => {
+const updatePassword = async (id, password) => {
     password = bcrypt.hashSync(password, 10);
     return await User.update({
         password
     }, {
         where: {
-            id: localStorage.getItem("user-id")
+            id
+        }
+    });
+}
+
+const updateProfile = async (body) => {
+    return await User.update(body, {
+        where: {
+            id
         }
     });
 }
@@ -113,6 +121,7 @@ module.exports = {
     findUserByUserId,
     findUserByEmail,
     updatePassword,
+    updateProfile,
     generateVerificationCode,
     findUserByVerificationCode
 }

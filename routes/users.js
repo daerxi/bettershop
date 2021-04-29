@@ -1,4 +1,5 @@
 const express = require('express');
+
 const {checkToken, decodeJWT} = require("../controllers/auth");
 const {User} = require("../sync");
 const {
@@ -9,6 +10,7 @@ const {
     destroyToken,
     updatePassword,
     findUserByEmail,
+    updateProfile,
     generateVerificationCode,
     findUserByVerificationCode
 } = require("../controllers/users");
@@ -88,15 +90,23 @@ router.get('/forgotPassword', async (req, res) => {
 router.post('/verify', async (req, res) => {
     const verificationCode = req.body.verificationCode;
     await findUserByVerificationCode(verificationCode).then(async user => {
-        return await updateToken(user.id, res).catch(e => {
+        await updateProfile({
+            verificationCode: null,
+            active: true
+        }).then(async () => {
+            return await updateToken(user.id, res).catch(e => {
+                res.status(400).json({error: e.toString()});
+            });
+        }).catch(e => {
             res.status(400).json({error: e.toString()});
         });
     });
 });
 
-router.post('/resetPassword', async (req, res) => {
+router.post('/resetPassword', checkToken, async (req, res) => {
     const password = req.body.password;
-    await updatePassword(password).then(async () => {
+    const userId = decodeJWT(req.header.token).sub;
+    await updatePassword(userId, password).then(async () => {
         res.status(200).json({success: true});
     }).catch(e => {
         res.status(400).json({error: "Update failed.", reason: e.toString()})
