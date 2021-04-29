@@ -15,6 +15,16 @@ const updateBusiness = async (body, userId) => {
     });
 }
 
+const getBusiness = async (userId) => {
+    return Business.findOne({
+        where: {
+            userId
+        }
+    });
+}
+
 module.exports = {
-    createBusiness
+    createBusiness,
+    getBusiness,
+    updateBusiness
 }
