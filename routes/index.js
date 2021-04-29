@@ -14,7 +14,7 @@ router.get('/', async function(req, res, next) {
   }
 });
 
-router.get('/:type', async function(req, res, next) {
+router.get('categories/:type', async function(req, res, next) {
   try {
     await Business.findAll({
       where: {

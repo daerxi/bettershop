@@ -57,10 +57,14 @@ router.get('/me', checkToken, function (req, res, next) {
 
 router.get('/:id', checkToken, function (req, res, next) {
     findUserByUserId(req.params.id).then(user => {
-        delete user["dataValues"].password;
-        delete user["dataValues"].lastName;
-        delete user["dataValues"].resetToken;
-        res.status(201).json(user);
+        if (user) {
+            delete user["dataValues"].password;
+            delete user["dataValues"].lastName;
+            delete user["dataValues"].resetToken;
+            res.status(201).json(user);
+        } else {
+            res.status(400).json({error: "Bad Request"});
+        }
     });
 });
 
