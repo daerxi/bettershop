@@ -1,9 +1,18 @@
 const express = require('express');
 const {checkToken, decodeJWT} = require("../controllers/auth");
 const {User} = require("../sync");
-const {createUser, login, findUserByUserId, destroyToken} = require("../controllers/users");
+const {
+    createUser,
+    login,
+    updateToken,
+    findUserByUserId,
+    destroyToken,
+    findUserByEmail,
+    generateVerificationCode,
+    findUserByVerificationCode
+} = require("../controllers/users");
 const {createBusiness} = require("../controllers/businesses");
-const {isNullOrEmpty, deleteSensitiveInfo} = require("../common/utils");
+const {isNullOrEmpty, deleteSensitiveInfo, getInsensitiveInfo} = require("../common/utils");
 const router = express.Router();
 
 router.get('/', function (req, res, next) {
@@ -54,10 +63,10 @@ router.get('/me', checkToken, function (req, res, next) {
     });
 });
 
-router.get('/:id', checkToken, function (req, res, next) {
+router.get('/:id', function (req, res, next) {
     findUserByUserId(req.params.id).then(user => {
         if (user) {
-            user = deleteSensitiveInfo(user);
+            user = getInsensitiveInfo(user);
             res.status(201).json(user);
         } else {
             res.status(400).json({error: "Bad Request"});
@@ -65,10 +74,30 @@ router.get('/:id', checkToken, function (req, res, next) {
     });
 });
 
+router.get('/forgotPassword', async (req, res) => {
+    const email = req.query.email.toLowerCase()
+    await findUserByEmail(email).then(async user => {
+        if (user) await generateVerificationCode(user, res).then(async () => {
+            res.status(200).json({success: true});
+        })
+    })
+});
+
+router.post('/verify', async (req, res) => {
+    const verificationCode = req.params.verificationCode;
+    await findUserByVerificationCode(verificationCode).then(async user => {
+        return await updateToken(user.id, res).catch(e => {
+            res.status(400).json({error: e.toString()});
+        });
+    });
+});
+
 router.delete('/logout', checkToken, async (req, res) => {
     const userId = decodeJWT(req.header.token).sub;
     await destroyToken(userId).then(async () => res.send(200))
-            .catch(e => { res.status(400).json({error: e}) });
+        .catch(e => {
+            res.status(400).json({error: e})
+        });
 });
 
 module.exports = router;

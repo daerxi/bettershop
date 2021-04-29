@@ -1,3 +1,21 @@
+const sgMail = require('@sendgrid/mail');
+
+function sendEmail(email, templatedId, dynamic_template_data, res, next) {
+    const msg = {
+        to: email,
+        from: 'donotreply@bettershop.au',
+        templateId: templatedId,
+        dynamic_template_data: dynamic_template_data
+    };
+    sgMail.send(msg, (error) => {
+        if (error) {
+            return res.status(400).json({error});
+        }
+    }).then(
+        next()
+    )
+}
+
 const isNullOrEmpty = (obj) => {
     return !obj || !obj.trim();
 }
@@ -17,9 +35,17 @@ function deleteSensitiveInfo(user) {
     return user;
 }
 
+function getInsensitiveInfo(user) {
+    return {
+        id: user.id,
+        avatar: user.avatar
+    }
+}
 
 module.exports = {
+    sendEmail,
     isNullOrEmpty,
     randomString,
-    deleteSensitiveInfo
+    deleteSensitiveInfo,
+    getInsensitiveInfo
 }
