@@ -85,7 +85,7 @@ router.get('/forgotPassword', async (req, res) => {
 });
 
 router.post('/verify', async (req, res) => {
-    const verificationCode = req.params.verificationCode;
+    const verificationCode = req.body.verificationCode;
     await findUserByVerificationCode(verificationCode).then(async user => {
         return await updateToken(user.id, res).catch(e => {
             res.status(400).json({error: e.toString()});
