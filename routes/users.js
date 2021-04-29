@@ -63,24 +63,25 @@ router.get('/me', checkToken, function (req, res, next) {
     });
 });
 
-router.get('/:id', function (req, res, next) {
-    findUserByUserId(req.params.id).then(user => {
-        if (user) {
-            user = getInsensitiveInfo(user);
-            res.status(201).json(user);
-        } else {
-            res.status(400).json({error: "Bad Request"});
-        }
-    });
-});
-
 router.get('/forgotPassword', async (req, res) => {
-    const email = req.query.email.toLowerCase()
-    await findUserByEmail(email).then(async user => {
-        if (user) await generateVerificationCode(user, res).then(async () => {
-            res.status(200).json({success: true});
-        })
-    })
+    if (!isNullOrEmpty(req.query.email)) {
+        const email = req.query.email.toLowerCase()
+        await findUserByEmail(email).then(async user => {
+            if (user) {
+                await generateVerificationCode(user, res).then(async () => {
+                    res.status(200).json({success: true});
+                });
+            } else {
+                res.status(404).json({error: "Account does not exist."});
+            }
+        }).catch(e => {
+            console.log(e)
+            res.status(400).json({error: "Unknown reason.", reason: e.toString()});
+        });
+    } else {
+        res.status(400).json({error: "Email address is not provided."});
+    }
+
 });
 
 router.post('/verify', async (req, res) => {
@@ -98,6 +99,17 @@ router.delete('/logout', checkToken, async (req, res) => {
         .catch(e => {
             res.status(400).json({error: e})
         });
+});
+
+router.get('/:id', function (req, res, next) {
+    findUserByUserId(req.params.id).then(user => {
+        if (user) {
+            user = getInsensitiveInfo(user);
+            res.status(201).json(user);
+        } else {
+            res.status(400).json({error: "Bad Request"});
+        }
+    });
 });
 
 module.exports = router;

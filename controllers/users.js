@@ -60,7 +60,7 @@ const findUserByUserId = async (id) => {
 
 const generateVerificationCode = async (user, res) => {
     const verificationCode = randomString(6)
-    sendEmail(user.email, "d-d85183e356dd4bc683aa63698359c76c", {verificationCode}, res, () => {
+    sendEmail(user.email, "d-d85183e356dd4bc683aa63698359c76c", {code: verificationCode}, res, () => {
         return User.update({
             verificationCode
         }, {

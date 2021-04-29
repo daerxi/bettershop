@@ -1,6 +1,7 @@
 const sgMail = require('@sendgrid/mail');
 
 function sendEmail(email, templatedId, dynamic_template_data, res, next) {
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
     const msg = {
         to: email,
         from: 'donotreply@bettershop.au',
@@ -9,7 +10,8 @@ function sendEmail(email, templatedId, dynamic_template_data, res, next) {
     };
     sgMail.send(msg, (error) => {
         if (error) {
-            return res.status(400).json({error});
+            console.log(error);
+            return res.status(400).json(error);
         }
     }).then(
         next()
