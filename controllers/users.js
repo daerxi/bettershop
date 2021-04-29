@@ -68,13 +68,24 @@ const generateVerificationCode = async (user, res) => {
                 id: user.id
             }
         });
-    })
+    });
 }
 
 const findUserByVerificationCode = async (verificationCode) => {
     return User.findOne({
         where: {
             verificationCode
+        }
+    })
+}
+
+const updatePassword = async (password) => {
+    password = bcrypt.hashSync(password, 10);
+    return await User.update({
+        password
+    }, {
+        where: {
+            id: localStorage.getItem("user-id")
         }
     });
 }
@@ -101,6 +112,7 @@ module.exports = {
     destroyToken,
     findUserByUserId,
     findUserByEmail,
+    updatePassword,
     generateVerificationCode,
     findUserByVerificationCode
 }
