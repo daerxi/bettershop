@@ -1,5 +1,5 @@
 const express = require('express');
-const {updateBusiness, getBusiness} = require("../controllers/businesses");
+const {updateBusiness, getBusiness, getBusinessById} = require("../controllers/businesses");
 const {decodeJWT, checkToken} = require("../controllers/auth");
 const {Business} = require("../sync");
 const router = express.Router();
@@ -32,6 +32,16 @@ router.get('/info', checkToken ,async function(req, res, next) {
   try {
     const userId = decodeJWT(req.header.token).sub;
     getBusiness(userId).then(business => {
+      res.status(200).json(business);
+    });
+  } catch (error) {
+    res.status(400).json({error});
+  }
+});
+
+router.get('/info/:id', checkToken ,async function(req, res, next) {
+  try {
+    getBusinessById(req.params.id).then(business => {
       res.status(200).json(business);
     });
   } catch (error) {
