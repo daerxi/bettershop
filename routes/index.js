@@ -16,7 +16,7 @@ router.get('/:type', function(req, res, next) {
   try {
     Business.findAll({
       where: {
-        category: type
+        category: req.params.type
       }
     }).then(async businesses => {
       res.status(200).json(businesses);
