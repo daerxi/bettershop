@@ -3,7 +3,7 @@ const {checkToken, decodeJWT} = require("../controllers/auth");
 const {User} = require("../sync");
 const {createUser, login, findUserByUserId, destroyToken} = require("../controllers/users");
 const {createBusiness} = require("../controllers/businesses");
-const {isNullOrEmpty} = require("../common/utils");
+const {isNullOrEmpty, deleteSensitiveInfo} = require("../common/utils");
 const router = express.Router();
 
 router.get('/', function (req, res, next) {
@@ -20,19 +20,18 @@ router.post('/', async (req, res) => {
     try {
         const email = req.body.email;
         const rawPassword = req.body.password;
-        const firstName = req.body.firstName;
-        const lastName = req.body.lastName;
+        const userName = req.body.userName;
         const isBusiness = req.body.isBusiness;
-        if (isNullOrEmpty(email) || isNullOrEmpty(rawPassword) || isNullOrEmpty(firstName) || isNullOrEmpty(lastName))
+        if (isNullOrEmpty(email) || isNullOrEmpty(rawPassword) || isNullOrEmpty(userName))
             throw "Required field cannot be empty.";
         else if (isBusiness && isNullOrEmpty(req.body.name))
             throw "Name is required as a business account.";
         else {
-            await createUser(firstName.trim(), lastName.trim(), email.toLowerCase().trim(), rawPassword.trim(), isBusiness).then(async user => {
+            await createUser(userName.trim(), email.toLowerCase().trim(), rawPassword.trim(), isBusiness).then(async user => {
                 if (user) {
                     // business account
                     if (isBusiness) await createBusiness(req.body.name.trim(), user.id);
-                    delete user["dataValues"].password;
+                    user = deleteSensitiveInfo(user);
                     res.status(201).json(user);
                 } else res.status(400).json({error: "Unknown reason."});
             });
@@ -50,7 +49,7 @@ router.post('/login', async (req, res) => {
 router.get('/me', checkToken, function (req, res, next) {
     const userId = decodeJWT(req.header.token).sub;
     findUserByUserId(userId).then(user => {
-        delete user["dataValues"].password;
+        user = deleteSensitiveInfo(user);
         res.status(201).json(user);
     });
 });
@@ -58,9 +57,7 @@ router.get('/me', checkToken, function (req, res, next) {
 router.get('/:id', checkToken, function (req, res, next) {
     findUserByUserId(req.params.id).then(user => {
         if (user) {
-            delete user["dataValues"].password;
-            delete user["dataValues"].lastName;
-            delete user["dataValues"].resetToken;
+            user = deleteSensitiveInfo(user);
             res.status(201).json(user);
         } else {
             res.status(400).json({error: "Bad Request"});

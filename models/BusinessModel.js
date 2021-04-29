@@ -9,6 +9,12 @@ module.exports = (sequelize, type) => {
             type: type.STRING,
             allowNull: false
         },
+        firstName: type.STRING,
+        lastName: type.STRING,
+        active: {
+            type: type.BOOLEAN,
+            defaultValue: false
+        },
         category: type.STRING,
         website: type.STRING,
         description: type.STRING,

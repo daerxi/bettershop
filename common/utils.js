@@ -11,8 +11,15 @@ function randomString(length) {
     return result;
 }
 
+function deleteSensitiveInfo(user) {
+    delete user["dataValues"].password;
+    delete user["dataValues"].resetToken;
+    return user;
+}
+
 
 module.exports = {
     isNullOrEmpty,
-    randomString
+    randomString,
+    deleteSensitiveInfo
 }

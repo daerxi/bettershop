@@ -10,6 +10,14 @@ module.exports = (sequelize, type) => {
             unique: true,
             allowNull: false
         },
+        userName: {
+            type: type.STRING,
+            allowNull: false
+        },
+        active: {
+            type: type.BOOLEAN,
+            defaultValue: false
+        },
         // 1 as business, 0 as normal user
         isBusiness:  type.BOOLEAN,
         avatar: type.STRING,
