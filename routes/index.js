@@ -126,4 +126,30 @@ router.get('/:businessId/posts', async function (req, res, next) {
     }
 });
 
+router.post('/:businessId/posts', checkToken, async function (req, res, next) {
+    try {
+        const userId = decodeJWT(req.header.token).sub;
+        Business.findOne({
+            where: {
+                id: req.params.businessId
+            }
+        }).then(async business => {
+            if (business) {
+                await Review.create({
+                    userId,
+                    businessId: business.id,
+                    content: req.body.content.trim(),
+                    rate: req.body.rate
+                }).then(async review => {
+                    res.status(201).json(review);
+                });
+            } else {
+                res.status(404).json({error: "Business is not found."});
+            }
+        });
+    } catch (error) {
+        res.status(400).json({error: error.toString()});
+    }
+})
+
 module.exports = router;
