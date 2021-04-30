@@ -1,4 +1,5 @@
 const express = require('express');
+const {sendEmail} = require("../common/utils");
 
 const {checkToken, decodeJWT} = require("../controllers/auth");
 const {User} = require("../sync");
@@ -44,7 +45,9 @@ router.post('/', async (req, res) => {
                     // business account
                     if (isBusiness) await createBusiness(req.body.name.trim(), user.id);
                     user = deleteSensitiveInfo(user);
-                    res.status(201).json(user);
+                    await generateVerificationCode(user, res).then(async () => {
+                        res.status(201).json(user);
+                    });
                 } else res.status(400).json({error: "Unknown reason."});
             });
         }
