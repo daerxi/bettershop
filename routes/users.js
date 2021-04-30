@@ -108,7 +108,7 @@ router.post('/verify', async (req, res) => {
     });
 });
 
-router.post('/resetPassword', checkToken, async (req, res) => {
+router.put('/resetPassword', checkToken, async (req, res) => {
     const userId = decodeJWT(req.header.token).sub;
     await updatePassword(userId, req.body.password.trim()).then(async () => {
         res.status(200).json({success: true});
