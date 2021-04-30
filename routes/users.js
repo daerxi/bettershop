@@ -58,7 +58,9 @@ router.post('/', async (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
-    return await login(req.body.email, req.body.password, res);
+    return await login(req.body.email, req.body.password, res).catch(e => {
+        res.status(400).json({error: "Bad Request", reason: e.toString()})
+    });
 });
 
 router.get('/me', checkToken, function (req, res, next) {
@@ -112,7 +114,7 @@ router.post('/resetPassword', checkToken, async (req, res) => {
         res.status(200).json({success: true});
     }).catch(e => {
         res.status(400).json({error: "Update failed.", reason: e.toString()})
-    })
+    });
 });
 
 
@@ -130,8 +132,10 @@ router.get('/:id', function (req, res, next) {
             user = getInsensitiveInfo(user);
             res.status(201).json(user);
         } else {
-            res.status(400).json({error: "Bad Request"});
+            res.status(404).json({error: "Not found"});
         }
+    }).catch(e => {
+        res.status(400).json({error: "Bad Request"});
     });
 });
 
