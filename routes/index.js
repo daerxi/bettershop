@@ -1,3 +1,5 @@
+import { isNullOrEmpty } from "../../bettershop-vue/src/utils/helper";
+
 const express = require('express');
 const {Op} = require("sequelize");
 const {updateBusiness, getBusiness, getBusinessById} = require("../controllers/businesses");
@@ -42,9 +44,19 @@ router.get('/info', checkToken, async function (req, res, next) {
 
 router.get('/info/:id', checkToken, async function (req, res, next) {
     try {
-        getBusinessById(req.params.id).then(business => {
-            res.status(200).json(business);
-        });
+        if (isNullOrEmpty(req.query.id)) {
+            getBusinessById(req.query.id).then(business => {
+                if (business) res.status(200).json(business);
+                else res.status(404).json({error: "Business not found"});
+            });
+        } else if (isNullOrEmpty(req.query.userId)) {
+            getBusiness(req.query.userId).then(async business => {
+                if (business) res.status(200).json(business);
+                else res.status(404).json({error: "Business not found"});
+            })
+        } else {
+            res.status(400).json({error: "Either userId or businessId is required."})
+        }
     } catch (error) {
         res.status(400).json({error});
     }
