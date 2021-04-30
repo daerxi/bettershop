@@ -83,7 +83,6 @@ router.get('/forgotPassword', async (req, res) => {
                 res.status(404).json({error: "Account does not exist."});
             }
         }).catch(e => {
-            console.log(e)
             res.status(400).json({error: "Unknown reason.", reason: e.toString()});
         });
     } else {

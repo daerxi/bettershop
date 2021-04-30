@@ -10,7 +10,6 @@ function sendEmail(email, templatedId, dynamic_template_data, res, next) {
     };
     sgMail.send(msg, (error) => {
         if (error) {
-            console.log(error);
             return res.status(400).json(error);
         }
     }).then(
@@ -40,7 +39,8 @@ function deleteSensitiveInfo(user) {
 function getInsensitiveInfo(user) {
     return {
         id: user.id,
-        avatar: user.avatar
+        avatar: user.avatar,
+        isBusiness: user.isBusiness
     }
 }
 

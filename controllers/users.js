@@ -26,7 +26,6 @@ const login = async (email, rawPassword, res) => {
 }
 
 const updateToken = async (id, res) => {
-    console.log("&&&&&&", id);
     const token = signToken(id);
     await findTokenByUserId(id).then(async userToken => {
         if (userToken) await destroyToken(id);
