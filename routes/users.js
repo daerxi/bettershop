@@ -93,12 +93,12 @@ router.get('/forgotPassword', async (req, res) => {
 router.post('/verify', async (req, res) => {
     const verificationCode = req.body.verificationCode;
     await findUserByVerificationCode(verificationCode).then(async user => {
-        await updateProfile({
+        await updateProfile(user.id, {
             verificationCode: null,
             active: true
         }).then(async () => {
-            return await updateToken(user.id, res).catch(e => {
-                res.status(400).json({error: e.toString()});
+            await updateToken(user.id, res).catch(e => {
+                return res.status(400).json({error: e.toString()});
             });
         }).catch(e => {
             res.status(400).json({error: e.toString()});
@@ -107,9 +107,8 @@ router.post('/verify', async (req, res) => {
 });
 
 router.post('/resetPassword', checkToken, async (req, res) => {
-    const password = req.body.password;
     const userId = decodeJWT(req.header.token).sub;
-    await updatePassword(userId, password).then(async () => {
+    await updatePassword(userId, req.body.password.trim()).then(async () => {
         res.status(200).json({success: true});
     }).catch(e => {
         res.status(400).json({error: "Update failed.", reason: e.toString()})

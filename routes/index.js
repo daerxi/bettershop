@@ -2,7 +2,7 @@ const express = require('express');
 const {Op} = require("sequelize");
 const {updateBusiness, getBusiness, getBusinessById} = require("../controllers/businesses");
 const {decodeJWT, checkToken} = require("../controllers/auth");
-const {Business} = require("../sync");
+const {Business, Review} = require("../sync");
 const router = express.Router();
 
 router.get('/', async function (req, res, next) {
@@ -107,6 +107,20 @@ router.get('/search', async function (req, res, next) {
         }).then(async businesses => {
             res.status(200).json(businesses);
         })
+    } catch (error) {
+        res.status(400).json({error: error.toString()});
+    }
+});
+
+router.get('/:businessId/posts', async function (req, res, next) {
+    try {
+        Review.findAll({
+            where: {
+                businessId: req.params.businessId
+            }
+        }).then(async reviews => {
+            res.status(200).json(reviews);
+        });
     } catch (error) {
         res.status(400).json({error: error.toString()});
     }

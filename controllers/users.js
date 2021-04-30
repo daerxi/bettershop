@@ -26,6 +26,7 @@ const login = async (email, rawPassword, res) => {
 }
 
 const updateToken = async (id, res) => {
+    console.log("&&&&&&", id);
     const token = signToken(id);
     await findTokenByUserId(id).then(async userToken => {
         if (userToken) await destroyToken(id);
@@ -90,7 +91,7 @@ const updatePassword = async (id, password) => {
     });
 }
 
-const updateProfile = async (body) => {
+const updateProfile = async (id, body) => {
     return await User.update(body, {
         where: {
             id
