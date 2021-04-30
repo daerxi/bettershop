@@ -1,9 +1,8 @@
-import { isNullOrEmpty } from "../../bettershop-vue/src/utils/helper";
-
 const express = require('express');
 const {Op} = require("sequelize");
 const {updateBusiness, getBusiness, getBusinessById} = require("../controllers/businesses");
 const {decodeJWT, checkToken} = require("../controllers/auth");
+const {isNullOrEmpty} = require("../common/utils");
 const {Business, Review} = require("../sync");
 const router = express.Router();
 

@@ -1,4 +1,4 @@
-const {Business, BusinessToken} = require("../sync");
+const {Business} = require("../sync");
 
 const createBusiness = async (name, userId) => {
     return await Business.create({
