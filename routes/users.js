@@ -64,8 +64,6 @@ router.post('/login', async (req, res) => {
             res.status(400).json({error: "Bad Request", reason: e.toString()})
         });
     }
-
-
 });
 
 router.get('/me', checkToken, function (req, res, next) {
