@@ -32,30 +32,30 @@ router.get('/categories/:type', async function (req, res, next) {
 
 router.get('/info', checkToken, async function (req, res, next) {
     try {
-        const userId = decodeJWT(req.header.token).sub;
-        getBusiness(userId).then(business => {
-            res.status(200).json(business);
-        });
+        const getBus = (get, param) => {
+            get(param).then(business => {
+                    if (business) res.status(200).json(business);
+                    else res.status(404).json({error: "Business not found"});
+            });
+        }
+        if (isNullOrEmpty(req.query.id) && isNullOrEmpty(req.query.userId)) {
+            const userId = decodeJWT(req.header.token).sub;
+            getBus(getBusiness, userId)
+        } else if (isNullOrEmpty(req.query.userId) && !isNullOrEmpty(req.query.id)) {
+            getBus(getBusinessById, req.query.id)
+        } else if (isNullOrEmpty(req.query.id) && !isNullOrEmpty(req.query.userId)) {
+            getBus(getBusinessById, req.query.userId)
+        } else {
+            res.status(400).json({error: "Wrong query params"});
+        }
     } catch (error) {
         res.status(400).json({error: error.toString()});
     }
 });
 
-router.get('/info/:id', checkToken, async function (req, res, next) {
+router.get('/info', checkToken, async function (req, res, next) {
     try {
-        if (isNullOrEmpty(req.query.id)) {
-            getBusinessById(req.query.id).then(business => {
-                if (business) res.status(200).json(business);
-                else res.status(404).json({error: "Business not found"});
-            });
-        } else if (isNullOrEmpty(req.query.userId)) {
-            getBusiness(req.query.userId).then(async business => {
-                if (business) res.status(200).json(business);
-                else res.status(404).json({error: "Business not found"});
-            })
-        } else {
-            res.status(400).json({error: "Either userId or businessId is required."})
-        }
+
     } catch (error) {
         res.status(400).json({error});
     }
