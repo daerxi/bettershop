@@ -1,5 +1,4 @@
 const express = require('express');
-const {sendEmail} = require("../common/utils");
 
 const {checkToken, decodeJWT} = require("../controllers/auth");
 const {User} = require("../sync");
@@ -58,10 +57,15 @@ router.post('/', async (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
-    if (req.body.email.trim())
-    return await login(req.body.email, req.body.password, res).catch(e => {
-        res.status(400).json({error: "Bad Request", reason: e.toString()})
-    });
+    if (isNullOrEmpty(req.body.email) || isNullOrEmpty(req.body.password)) {
+        res.status(400).json({error: "Please fill out required fields."});
+    } else {
+        return await login(req.body.email, req.body.password, res).catch(e => {
+            res.status(400).json({error: "Bad Request", reason: e.toString()})
+        });
+    }
+
+
 });
 
 router.get('/me', checkToken, function (req, res, next) {
