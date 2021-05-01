@@ -58,6 +58,7 @@ router.post('/', async (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
+    if (req.body.email.trim())
     return await login(req.body.email, req.body.password, res).catch(e => {
         res.status(400).json({error: "Bad Request", reason: e.toString()})
     });
