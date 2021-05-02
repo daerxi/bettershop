@@ -2,7 +2,7 @@ const bcrypt = require("bcrypt");
 const {sendEmail} = require("../common/utils");
 const {randomString} = require("../common/utils");
 const {signToken} = require("./auth");
-const {User, UserToken} = require("../sync");
+const {User, UserToken, Review} = require("../sync");
 
 const createUser = async (userName, email, rawPassword, isBusiness) => {
     const password = bcrypt.hashSync(rawPassword, 10);
@@ -113,6 +113,14 @@ const createToken = async (userId, token) => {
     });
 }
 
+const getReviewsByUserId = async (userId) => {
+    return Review.findAll({
+        where: {
+            userId
+        }
+    });
+}
+
 module.exports = {
     login,
     createUser,
@@ -122,6 +130,7 @@ module.exports = {
     findUserByEmail,
     updatePassword,
     updateProfile,
+    getReviewsByUserId,
     generateVerificationCode,
     findUserByVerificationCode
 }

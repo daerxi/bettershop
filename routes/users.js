@@ -1,4 +1,5 @@
 const express = require('express');
+const {getReviewsByUserId} = require("../controllers/users");
 
 const {checkToken, decodeJWT} = require("../controllers/auth");
 const {User} = require("../sync");
@@ -22,7 +23,7 @@ router.get('/', function (req, res, next) {
     try {
         User.findAll().then(async users => {
             res.status(200).send(users);
-        })
+        });
     } catch (error) {
         res.status(400).json({error});
     }
@@ -138,6 +139,14 @@ router.get('/:id', function (req, res, next) {
         }
     }).catch(e => {
         res.status(400).json({error: "Bad Request"});
+    });
+});
+
+router.get('/:id/reviews', checkToken, async (req, res) => {
+    getReviewsByUserId(req.params.id).then(reviews => {
+        res.status(200).send(reviews);
+    }).catch(e => {
+        res.status(400).json({error: e})
     });
 });
 
