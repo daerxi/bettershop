@@ -124,7 +124,6 @@ router.get('/:businessId/reviews', async function (req, res, next) {
         }).then(async reviews => {
             let rate = 0;
             for (const review of reviews) {
-                console.log("**", review.rate)
                 rate += review.rate;
             }
             rate = parseInt(rate/reviews.length);
