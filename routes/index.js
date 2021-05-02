@@ -53,14 +53,6 @@ router.get('/info', checkToken, async function (req, res, next) {
     }
 });
 
-router.get('/info', checkToken, async function (req, res, next) {
-    try {
-
-    } catch (error) {
-        res.status(400).json({error});
-    }
-});
-
 router.put('/info', checkToken, async function (req, res, next) {
     try {
         const userId = decodeJWT(req.header.token).sub;
@@ -123,14 +115,19 @@ router.get('/search', async function (req, res, next) {
     }
 });
 
-router.get('/:businessId/posts', async function (req, res, next) {
+router.get('/:businessId/reviews', async function (req, res, next) {
     try {
         Review.findAll({
             where: {
                 businessId: req.params.businessId
             }
         }).then(async reviews => {
-            res.status(200).json(reviews);
+            let rate = 0;
+            for (const review in reviews) {
+                rate += review.rate;
+            }
+            rate = rate/reviews.length;
+            res.status(200).json({rate, reviews});
         });
     } catch (error) {
         res.status(400).json({error: error.toString()});
