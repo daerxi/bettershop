@@ -123,10 +123,11 @@ router.get('/:businessId/reviews', async function (req, res, next) {
             }
         }).then(async reviews => {
             let rate = 0;
-            for (const review in reviews) {
+            for (const review of reviews) {
+                console.log("**", review.rate)
                 rate += review.rate;
             }
-            rate = rate/reviews.length;
+            rate = parseInt(rate/reviews.length);
             res.status(200).json({rate, reviews});
         });
     } catch (error) {
