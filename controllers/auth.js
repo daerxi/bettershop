@@ -1,5 +1,5 @@
 const JWT = require("jsonwebtoken");
-const {UserToken, BusinessToken} = require("../sync");
+const {UserToken} = require("../sync");
 const moment = require("moment");
 
 function tokenResult(token, res, next) {
