@@ -39,6 +39,7 @@ function deleteSensitiveInfo(user) {
 function getInsensitiveInfo(user) {
     return {
         id: user.id,
+        userName: user.userName,
         avatar: user.avatar,
         isBusiness: user.isBusiness
     }
