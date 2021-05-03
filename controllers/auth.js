@@ -37,12 +37,12 @@ const accessToken = (req, res) => {
     } else res.sendStatus(403);
 }
 
-const signToken = id => {
+const signToken = (id, time = 30, unit = 'minutes') => {
     return JWT.sign({
         iss: 'BetterShop',
         sub: id,
         iat: moment().unix(),
-        exp: moment().add(1, 'week').unix()
+        exp: moment().add(time, unit).unix()
     }, process.env.JWT_SECRET);
 }
 

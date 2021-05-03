@@ -12,6 +12,7 @@ const {
     updatePassword,
     findUserByEmail,
     updateProfile,
+    refreshToken,
     generateVerificationCode,
     findUserByVerificationCode
 } = require("../controllers/users");
@@ -73,6 +74,16 @@ router.get('/me', checkToken, function (req, res, next) {
         user = deleteSensitiveInfo(user);
         res.status(201).json(user);
     });
+});
+
+router.get('/refresh', checkToken, function (req, res, next) {
+    try {
+        const token = req.query.refreshToken;
+        return refreshToken(token, res);
+    } catch(e) {
+        res.status(400).json({error: e.toString()})
+    }
+
 });
 
 router.get('/forgotPassword', async (req, res) => {

@@ -27,9 +27,10 @@ const login = async (email, rawPassword, res) => {
 
 const updateToken = async (id, res) => {
     const token = signToken(id);
+    const refreshToken = signToken(id, 1, 'day');
     await findTokenByUserId(id).then(async userToken => {
         if (userToken) await destroyToken(id);
-        const loginInfo = await createToken(id, token);
+        const loginInfo = await createToken(id, token, refreshToken);
         res.status(201).json(loginInfo);
     });
 }
@@ -106,10 +107,19 @@ const destroyToken = async (userId) => {
     });
 }
 
-const createToken = async (userId, token) => {
+const createToken = async (userId, token, refreshToken) => {
     return await UserToken.create({
         userId,
-        token
+        token,
+        refreshToken
+    });
+}
+
+const refreshToken = async (refreshToken, res) => {
+    return UserToken.findOne({
+        refreshToken
+    }).then(async userToken => {
+        await updateToken(userToken.userId, res);
     });
 }
 
@@ -131,6 +141,7 @@ module.exports = {
     updatePassword,
     updateProfile,
     getReviewsByUserId,
+    refreshToken,
     generateVerificationCode,
     findUserByVerificationCode
 }
