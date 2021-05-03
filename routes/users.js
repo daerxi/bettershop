@@ -107,19 +107,24 @@ router.get('/forgotPassword', async (req, res) => {
 });
 
 router.post('/verify', async (req, res) => {
-    const verificationCode = req.body.verificationCode;
-    await findUserByVerificationCode(verificationCode).then(async user => {
-        await updateProfile(user.id, {
-            verificationCode: null,
-            active: true
-        }).then(async () => {
-            await updateToken(user.id, res).catch(e => {
-                return res.status(400).json({error: e.toString()});
+    if (!isNullOrEmpty(req.body.verificationCode)) {
+        const verificationCode = req.body.verificationCode;
+        await findUserByVerificationCode(verificationCode).then(async user => {
+            await updateProfile(user.id, {
+                verificationCode: null,
+                active: true
+            }).then(async () => {
+                await updateToken(user.id, res).catch(e => {
+                    return res.status(400).json({error: e.toString()});
+                });
+            }).catch(e => {
+                res.status(400).json({error: e.toString()});
             });
-        }).catch(e => {
-            res.status(400).json({error: e.toString()});
         });
-    });
+    } else {
+        res.status(400).json({error: "Verification code is required."});
+    }
+
 });
 
 router.put('/resetPassword', checkToken, async (req, res) => {
