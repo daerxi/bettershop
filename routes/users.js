@@ -76,7 +76,7 @@ router.get('/me', checkToken, function (req, res, next) {
     });
 });
 
-router.get('/refresh', checkToken, function (req, res, next) {
+router.get('/refresh', function (req, res, next) {
     try {
         const token = req.query.refreshToken;
         return refreshToken(token, res);
