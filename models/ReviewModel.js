@@ -20,6 +20,6 @@ module.exports = (sequelize, type) => {
             }
         },
         rate: type.INTEGER,
-        content: type.STRING
+        content: type.TEXT('LONG')
     });
 }

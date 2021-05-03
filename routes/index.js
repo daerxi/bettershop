@@ -134,7 +134,7 @@ router.get('/:businessId/reviews', async function (req, res, next) {
     }
 });
 
-router.post('/:businessId/posts', checkToken, async function (req, res, next) {
+router.post('/:businessId/reviews', checkToken, async function (req, res, next) {
     try {
         const userId = decodeJWT(req.header.token).sub;
         Business.findOne({
@@ -150,6 +150,8 @@ router.post('/:businessId/posts', checkToken, async function (req, res, next) {
                     rate: req.body.rate
                 }).then(async review => {
                     res.status(201).json(review);
+                }).catch(e => {
+                    res.status(400).json({error: e.toString()})
                 });
             } else {
                 res.status(404).json({error: "Business is not found."});

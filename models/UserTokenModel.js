@@ -16,6 +16,6 @@ module.exports = (sequelize, type) => {
             type: type.STRING,
             allowNull: false
         },
-        // refreshToken: type.STRING
+        refreshToken: type.STRING
     });
 }

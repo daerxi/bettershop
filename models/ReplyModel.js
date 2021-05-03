@@ -27,7 +27,7 @@ module.exports = (sequelize, type) => {
             }
         },
         content: {
-            type: type.STRING,
+            type: type.TEXT('LONG'),
             allowNull: false
         }
     });
