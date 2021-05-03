@@ -91,10 +91,17 @@ const updatePassword = async (id, password) => {
     });
 }
 
-const updateProfile = async (id, body) => {
+const updateProfile = async (id, email, body) => {
     return await User.update(body, {
         where: {
-            id
+            [Op.and]: [
+                {
+                    id
+                },
+                {
+                    email
+                }
+            ]
         }
     });
 }

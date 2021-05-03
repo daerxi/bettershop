@@ -80,7 +80,7 @@ router.get('/refresh', function (req, res, next) {
     try {
         const token = req.query.refreshToken;
         return refreshToken(token, res);
-    } catch(e) {
+    } catch (e) {
         res.status(400).json({error: e.toString()})
     }
 
@@ -110,7 +110,7 @@ router.post('/verify', async (req, res) => {
     if (!isNullOrEmpty(req.body.verificationCode)) {
         const verificationCode = req.body.verificationCode;
         await findUserByVerificationCode(verificationCode).then(async user => {
-            await updateProfile(user.id, {
+            await updateProfile(user.id, req.body.email,{
                 verificationCode: null,
                 active: true
             }).then(async () => {
