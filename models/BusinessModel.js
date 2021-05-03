@@ -17,7 +17,7 @@ module.exports = (sequelize, type) => {
         },
         category: type.STRING,
         website: type.STRING,
-        description: type.STRING,
+        description: type.TEXT('MEDIUM'),
         clicktrack: {
             type: type.INTEGER,
             defaultValue: 0
