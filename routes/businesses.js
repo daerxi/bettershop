@@ -8,7 +8,13 @@ const router = express.Router();
 
 router.get('/', async function (req, res, next) {
     try {
-        await Business.findAll().then(async businesses => {
+        await Business.findAll(
+            {
+                order: [
+                    ['clicktrack', 'DESC']
+                ]
+            }
+        ).then(async businesses => {
             res.status(200).json(businesses);
         });
     } catch (error) {
@@ -21,7 +27,10 @@ router.get('/categories/:type', async function (req, res, next) {
         await Business.findAll({
             where: {
                 category: req.params.type
-            }
+            },
+            order: [
+                ['clicktrack', 'DESC']
+            ]
         }).then(async businesses => {
             res.status(200).json(businesses);
         });
@@ -34,8 +43,8 @@ router.get('/info', checkToken, async function (req, res, next) {
     try {
         const getBus = (get, param) => {
             get(param).then(business => {
-                    if (business) res.status(200).json(business);
-                    else res.status(404).json({error: "Business not found"});
+                if (business) res.status(200).json(business);
+                else res.status(404).json({error: "Business not found"});
             });
         }
         if (isNullOrEmpty(req.query.id) && isNullOrEmpty(req.query.userId)) {
@@ -126,8 +135,27 @@ router.get('/:businessId/reviews', async function (req, res, next) {
             for (const review of reviews) {
                 rate += review.rate;
             }
-            rate = parseInt(rate/reviews.length);
+            rate = parseInt(rate / reviews.length);
             res.status(200).json({rate, reviews});
+        });
+    } catch (error) {
+        res.status(400).json({error: error.toString()});
+    }
+});
+
+router.put('/:businessId/click', async function (req, res, next) {
+    try {
+        getBusinessById(req.params.businessId).then(async business => {
+            if (!business) {
+                res.status(404).json({error: "Business not found"});
+            } else {
+                await updateBusiness(
+                    {clicktrack: business.clicktrack + 1},
+                    business.userId).then(async updated => {
+                    if (updated) res.status(200).json({success: true});
+                    else res.status(400).json({error: "Click track not updated"});
+                });
+            }
         });
     } catch (error) {
         res.status(400).json({error: error.toString()});
