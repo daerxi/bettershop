@@ -129,7 +129,10 @@ router.get('/:businessId/reviews', async function (req, res, next) {
         Review.findAll({
             where: {
                 businessId: req.params.businessId
-            }
+            },
+            order: [
+                ['updatedAt', 'DESC']
+            ]
         }).then(async reviews => {
             let rate = 0;
             for (const review of reviews) {
