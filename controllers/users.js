@@ -1,4 +1,5 @@
 const bcrypt = require("bcrypt");
+const {Op} = require("sequelize");
 const {sendEmail} = require("../common/utils");
 const {randomString} = require("../common/utils");
 const {signToken} = require("./auth");
