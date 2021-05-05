@@ -12,7 +12,9 @@ function sendEmail(email, templatedId, dynamic_template_data, res, next) {
         if (error) return res.status(400).json(error);
     }).then(
         next()
-    )
+    ).catch(e => {
+        return res.status(400).json({error: e.toString()});
+    })
 }
 
 const isNullOrEmpty = (obj) => {
