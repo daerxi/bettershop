@@ -89,8 +89,6 @@ router.get('/forgotPassword', async (req, res) => {
         await findUserByEmail(email).then(async user => {
             if (user) await generateVerificationCode(user, res);
             else res.status(404).json({error: "User not found"});
-        }).catch(e => {
-            res.status(400).json({error: "Unknown reason.", reason: e.toString()});
         });
     } else {
         res.status(400).json({error: "Email address is not provided."});
