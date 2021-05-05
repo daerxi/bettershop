@@ -87,11 +87,8 @@ router.get('/forgotPassword', async (req, res) => {
     if (!isNullOrEmpty(req.query.email)) {
         const email = req.query.email.toLowerCase()
         await findUserByEmail(email).then(async user => {
-            if (user) {
-                await generateVerificationCode(user, res);
-            } else {
-                res.status(404).json({error: "Account does not exist."});
-            }
+            if (user) await generateVerificationCode(user, res);
+            else res.status(404).json({error: "User not found"});
         }).catch(e => {
             res.status(400).json({error: "Unknown reason.", reason: e.toString()});
         });
