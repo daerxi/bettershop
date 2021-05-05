@@ -143,7 +143,7 @@ router.get('/:id', function (req, res, next) {
             res.status(404).json({error: "Not found"});
         }
     }).catch(e => {
-        res.status(400).json({error: "Bad Request"});
+        res.status(400).json({error: "Bad Request", reason: e.toString()});
     });
 });
 
