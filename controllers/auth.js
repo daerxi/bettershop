@@ -34,7 +34,7 @@ const accessToken = (req, res) => {
             if (!bearer[1].trim()) res.status(401).json({error: "Empty Token"});
             else return bearer[1].trim();
         else res.status(401).json({error: "Invalid Auth Type"});
-    } else res.sendStatus(403);
+    } else res.status(403).json({error: "Forbidden"});
 }
 
 const signToken = (id, time = 30, unit = 'minutes') => {

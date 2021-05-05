@@ -128,7 +128,7 @@ router.put('/resetPassword', checkToken, async (req, res) => {
 
 router.delete('/logout', checkToken, async (req, res) => {
     const userId = decodeJWT(req.header.token).sub;
-    await destroyToken(userId).then(async () => res.send(200))
+    await destroyToken(userId).then(async () => res.status(200).json({success: true}))
         .catch(e => {
             res.status(400).json({error: e})
         });
@@ -149,7 +149,7 @@ router.get('/:id', function (req, res, next) {
 
 router.get('/:id/reviews', checkToken, async (req, res) => {
     getReviewsByUserId(req.params.id).then(reviews => {
-        res.status(200).send(reviews);
+        res.status(200).json(reviews);
     }).catch(e => {
         res.status(400).json({error: e})
     });
