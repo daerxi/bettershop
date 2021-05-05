@@ -1,9 +1,10 @@
 const bcrypt = require("bcrypt");
 const {Op} = require("sequelize");
-const {sendEmail} = require("../common/utils");
 const {randomString} = require("../common/utils");
 const {signToken} = require("./auth");
 const {User, UserToken, Review} = require("../sync");
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const createUser = async (userName, email, rawPassword, isBusiness) => {
     const password = bcrypt.hashSync(rawPassword, 10);
@@ -62,7 +63,15 @@ const findUserByUserId = async (id) => {
 
 const generateVerificationCode = async (user, res) => {
     const verificationCode = randomString(6)
-    sendEmail(user.email, "d-d85183e356dd4bc683aa63698359c76c", {code: verificationCode}, res, async () => {
+    const msg = {
+        to: user.email,
+        from: 'donotreply@bettershop.au',
+        templateId: "d-d85183e356dd4bc683aa63698359c76c",
+        dynamic_template_data: {code: verificationCode}
+    };
+    await sgMail.send(msg, (error) => {
+        if (error) return res.status(400).json(error);
+    }).then(async () => {
         await User.update({
             verificationCode
         }, {
@@ -72,7 +81,11 @@ const generateVerificationCode = async (user, res) => {
         }).then(async response => {
             if (response) res.status(201).json({success: true});
             else res.status(400).json({error: "updated failed"});
+        }).catch(e => {
+            return res.status(400).json({error: e.toString()});
         })
+    }).catch(e => {
+        return res.status(400).json({error: e.toString()});
     });
 }
 

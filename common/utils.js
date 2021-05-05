@@ -1,22 +1,3 @@
-const sgMail = require('@sendgrid/mail');
-
-function sendEmail(email, templatedId, dynamic_template_data, res, next) {
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-    const msg = {
-        to: email,
-        from: 'donotreply@bettershop.au',
-        templateId: templatedId,
-        dynamic_template_data: dynamic_template_data
-    };
-    sgMail.send(msg, (error) => {
-        if (error) return res.status(400).json(error);
-    }).then(
-        next()
-    ).catch(e => {
-        return res.status(400).json({error: e.toString()});
-    })
-}
-
 const isNullOrEmpty = (obj) => {
     return !obj || !obj.trim();
 }
@@ -46,7 +27,6 @@ function getInsensitiveInfo(user) {
 }
 
 module.exports = {
-    sendEmail,
     isNullOrEmpty,
     randomString,
     deleteSensitiveInfo,

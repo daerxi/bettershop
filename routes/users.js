@@ -1,6 +1,5 @@
 const express = require('express');
 const {getReviewsByUserId} = require("../controllers/users");
-
 const {checkToken, decodeJWT} = require("../controllers/auth");
 const {User} = require("../sync");
 const {
