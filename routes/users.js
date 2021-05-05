@@ -85,13 +85,12 @@ router.get('/refresh', function (req, res, next) {
 
 router.get('/forgotPassword', async (req, res) => {
     if (!isNullOrEmpty(req.query.email)) {
-        const email = req.query.email.toLowerCase()
-        await findUserByEmail(email).then(async user => {
-            if (user) await generateVerificationCode(user, res);
-            else res.status(404).json({error: "User not found"});
+        await findUserByEmail(req.query.email.toLowerCase()).then(async user => {
+            if (user) return await generateVerificationCode(user, res);
+            else return res.status(404).json({error: "User not found"});
         });
     } else {
-        res.status(400).json({error: "Email address is not provided."});
+        return res.status(400).json({error: "Email address is not provided."});
     }
 });
 
