@@ -62,14 +62,17 @@ const findUserByUserId = async (id) => {
 
 const generateVerificationCode = async (user, res) => {
     const verificationCode = randomString(6)
-    sendEmail(user.email, "d-d85183e356dd4bc683aa63698359c76c", {code: verificationCode}, res, () => {
-        return User.update({
+    sendEmail(user.email, "d-d85183e356dd4bc683aa63698359c76c", {code: verificationCode}, res, async () => {
+        await User.update({
             verificationCode
         }, {
             where: {
                 id: user.id
             }
-        });
+        }).then(async response => {
+            if (response) res.status(201).json({success: true});
+            else res.status(400).json({error: "updated failed"});
+        })
     });
 }
 

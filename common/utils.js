@@ -9,9 +9,7 @@ function sendEmail(email, templatedId, dynamic_template_data, res, next) {
         dynamic_template_data: dynamic_template_data
     };
     sgMail.send(msg, (error) => {
-        if (error) {
-            return res.status(400).json(error);
-        }
+        if (error) return res.status(400).json(error);
     }).then(
         next()
     )

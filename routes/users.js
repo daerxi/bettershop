@@ -46,9 +46,7 @@ router.post('/', async (req, res) => {
                     // business account
                     if (isBusiness) await createBusiness(req.body.name.trim(), user.id);
                     user = deleteSensitiveInfo(user);
-                    await generateVerificationCode(user, res).then(async () => {
-                        res.status(201).json(user);
-                    });
+                    await generateVerificationCode(user, res);
                 } else res.status(400).json({error: "Unknown reason."});
             });
         }
@@ -91,9 +89,7 @@ router.get('/forgotPassword', async (req, res) => {
         const email = req.query.email.toLowerCase()
         await findUserByEmail(email).then(async user => {
             if (user) {
-                await generateVerificationCode(user, res).then(async () => {
-                    res.status(200).json({success: true});
-                });
+                await generateVerificationCode(user, res);
             } else {
                 res.status(404).json({error: "Account does not exist."});
             }
