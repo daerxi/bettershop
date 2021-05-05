@@ -89,9 +89,7 @@ router.get('/forgotPassword', async (req, res) => {
             if (user) return await generateVerificationCode(user, res);
             else return res.status(404).json({error: "User not found"});
         });
-    } else {
-        return res.status(400).json({error: "Email address is not provided."});
-    }
+    } else return res.status(400).json({error: "Email address is not provided."});
 });
 
 router.post('/verify', async (req, res) => {

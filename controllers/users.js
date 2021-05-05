@@ -62,30 +62,35 @@ const findUserByUserId = async (id) => {
 }
 
 const generateVerificationCode = async (user, res) => {
-    const verificationCode = randomString(6)
+    const verificationCode = randomString(6);
     const msg = {
         to: user.email,
         from: 'donotreply@bettershop.au',
         templateId: "d-d85183e356dd4bc683aa63698359c76c",
         dynamic_template_data: {code: verificationCode}
     };
-    await sgMail.send(msg, (error) => {
-        if (error) return res.status(400).json(error);
-    }).then(async () => {
-        await User.update({
-            verificationCode
-        }, {
-            where: {
-                id: user.id
-            }
-        }).then(async response => {
+
+    await sgMail
+        .send(msg)
+        .then(async (response) => {
             console.log(response);
-            if (response) return res.status(201).json({success: true});
-            else return res.status(400).json({error: "updated failed"});
-        }).catch(e => {
-            return res.status(400).json({error: e.toString()});
+            await User.update({
+                verificationCode
+            }, {
+                where: {
+                    id: user.id
+                }
+            }).then(async updated => {
+                console.log(updated);
+                if (updated) return res.status(201).json({success: true});
+                else return res.status(400).json({error: "updated failed"});
+            }).catch(e => {
+                return res.status(400).json({error: e.toString()});
+            })
         })
-    });
+        .catch((error) => {
+            res.status(400).json({error})
+        });
 }
 
 const findUserByVerificationCode = async (verificationCode) => {
