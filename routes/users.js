@@ -93,7 +93,6 @@ router.get('/forgotPassword', async (req, res) => {
     } else {
         res.status(400).json({error: "Email address is not provided."});
     }
-
 });
 
 router.post('/verify', async (req, res) => {
@@ -118,7 +117,6 @@ router.post('/verify', async (req, res) => {
     } else {
         res.status(400).json({error: "Verification code is required."});
     }
-
 });
 
 router.put('/resetPassword', checkToken, async (req, res) => {
