@@ -79,9 +79,12 @@ const generateVerificationCode = async (user, res) => {
                 id: user.id
             }
         }).then(async response => {
+            console.log(response);
             if (response) res.status(201).json({success: true});
             else res.status(400).json({error: "updated failed"});
-        });
+        }).catch(e => {
+            return res.status(400).json({error: e.toString()});
+        })
     });
 }
 
