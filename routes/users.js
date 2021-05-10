@@ -1,4 +1,5 @@
 const express = require('express');
+const {getBusiness} = require("../controllers/businesses");
 const {getReviewsByUserId} = require("../controllers/users");
 const {checkToken, decodeJWT} = require("../controllers/auth");
 const {User} = require("../sync");
@@ -69,8 +70,14 @@ router.get('/me', checkToken, function (req, res, next) {
     const userId = decodeJWT(req.header.token).sub;
     findUserByUserId(userId).then(user => {
         user = deleteSensitiveInfo(user);
-        res.status(201).json(user);
-    });
+        if (user.isBusiness) getBusiness(user.id)
+            .then(async business => {
+                user.dataValues.business = business.dataValues;
+                res.status(201).json(user);
+            })
+            .catch(e => res.status(400).json({error: e.toString()}));
+        else res.status(201).json(user);
+    }).catch(e => res.status(400).json({error: e.toString()}));
 });
 
 router.get('/refresh', function (req, res, next) {
@@ -78,7 +85,7 @@ router.get('/refresh', function (req, res, next) {
         const token = req.query.refreshToken;
         return refreshToken(token, res);
     } catch (e) {
-        res.status(400).json({error: e.toString()})
+        res.status(400).json({error: e.toString()});
     }
 
 });
