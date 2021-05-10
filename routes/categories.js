@@ -7,7 +7,7 @@ router.get('/', async function(req, res, next) {
         res.status(200).json(categories);
     }).catch(error => {
         res.status(400).json({error});
-    })
+    });
 });
 
 module.exports = router;

@@ -191,6 +191,6 @@ router.post('/:businessId/reviews', checkToken, async function (req, res, next) 
     } catch (error) {
         res.status(400).json({error: error.toString()});
     }
-})
+});
 
 module.exports = router;
