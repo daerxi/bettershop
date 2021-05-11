@@ -31,10 +31,8 @@ router.post('/', checkToken, async function (req, res, next) {
         userId,
         businessId: req.body.businessId
     }).then(async wishlist => {
-        if (wishlist)
-            res.status(201).json(wishlist);
-        else
-            res.status(400).json({error: "Update wishlist failed."});
+        if (wishlist) res.status(201).json(wishlist);
+        else res.status(400).json({error: "Update wishlist failed."});
     }).catch(e => res.status(400).json({error: "Update wishlist failed.", reason: e.toString()}));
 });
 
@@ -54,7 +52,7 @@ router.get('/:businessId', checkToken, async function (req, res, next) {
                 ]
             }
         }).then(async wishlist => {
-            if (wishlist) res.status(200).json({success: true});
+            if (wishlist.length > 0) res.status(200).json({success: true});
             else res.status(200).json({success: false});
         }).catch(e => res.status(400).json({error: e.toString()}));
     } catch (e) {
