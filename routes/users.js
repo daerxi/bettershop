@@ -161,12 +161,4 @@ router.get('/:id', async function (req, res, next) {
     });
 });
 
-router.get('/:id/reviews', checkToken, async (req, res) => {
-    getReviewsByUserId(req.params.id).then(reviews => {
-        res.status(200).json(reviews);
-    }).catch(e => {
-        res.status(400).json({error: e})
-    });
-});
-
 module.exports = router;

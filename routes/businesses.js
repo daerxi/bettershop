@@ -168,28 +168,6 @@ router.get('/search', async function (req, res) {
     }
 });
 
-router.get('/:businessId/reviews', async function (req, res) {
-    try {
-        Review.findAll({
-            where: {
-                businessId: req.params.businessId
-            },
-            order: [
-                ['updatedAt', 'DESC']
-            ]
-        }).then(async reviews => {
-            let rate = 0;
-            for (const review of reviews) {
-                rate += review.rate;
-            }
-            rate = parseInt(rate / reviews.length);
-            res.status(200).json({rate, reviews});
-        });
-    } catch (error) {
-        res.status(400).json({error: error.toString()});
-    }
-});
-
 router.put('/:businessId/click', async function (req, res) {
     try {
         getBusinessById(req.params.businessId).then(async business => {
