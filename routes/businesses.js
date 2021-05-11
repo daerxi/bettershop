@@ -6,6 +6,25 @@ const {isNullOrEmpty} = require("../common/utils");
 const {Business, Review} = require("../sync");
 const router = express.Router();
 
+const getRate = async reviews => {
+    let rate = 0;
+    for (const review of reviews) {
+        rate += review.rate;
+    }
+    return parseInt(rate / reviews.length);
+}
+
+const findReviewsByBusinessId = async businessId => {
+    return await Review.findAll({
+        where: {
+            businessId
+        },
+        order: [
+            ['updatedAt', 'DESC']
+        ]
+    })
+}
+
 router.get('/', async function (req, res, next) {
     try {
         await Business.findAll(
@@ -15,7 +34,17 @@ router.get('/', async function (req, res, next) {
                 ]
             }
         ).then(async businesses => {
-            res.status(200).json(businesses);
+            let newBusinessList = []
+            for (const business of businesses) {
+                await findReviewsByBusinessId(business.id).then(async reviews => {
+                    await getRate(reviews).then(async rate => {
+                        business.dataValues.rate = rate;
+                    })
+                    business.dataValues.reviews = reviews;
+                    newBusinessList.push(business)
+                });
+            }
+            res.status(200).json(newBusinessList);
         });
     } catch (error) {
         res.status(400).json({error: error.toString()});
@@ -32,7 +61,17 @@ router.get('/categories/:type', async function (req, res, next) {
                 ['clicktrack', 'DESC']
             ]
         }).then(async businesses => {
-            res.status(200).json(businesses);
+            let newBusinessList = []
+            for (const business of businesses) {
+                await findReviewsByBusinessId(business.id).then(async reviews => {
+                    await getRate(reviews).then(async rate => {
+                        business.dataValues.rate = rate;
+                    })
+                    business.dataValues.reviews = reviews;
+                    newBusinessList.push(business)
+                });
+            }
+            res.status(200).json(newBusinessList);
         });
     } catch (error) {
         res.status(400).json({error: error.toString()});
@@ -42,9 +81,20 @@ router.get('/categories/:type', async function (req, res, next) {
 router.get('/info', checkToken, async function (req, res, next) {
     try {
         const getBus = (get, param) => {
-            get(param).then(business => {
-                if (business) res.status(200).json(business);
-                else res.status(404).json({error: "Business not found"});
+            get(param).then(async business => {
+                if (business) {
+                    await findReviewsByBusinessId(business.id).then(async reviews => {
+                        let rate = 0;
+                        for (const review of reviews) {
+                            rate += review.rate;
+                        }
+                        rate = parseInt(rate / reviews.length);
+
+                        business.dataValues.rate = rate;
+                        business.dataValues.reviews = reviews;
+                        res.status(200).json(business);
+                    });
+                } else res.status(404).json({error: "Business not found"});
             });
         }
         if (isNullOrEmpty(req.query.id) && isNullOrEmpty(req.query.userId)) {
@@ -117,7 +167,17 @@ router.get('/search', async function (req, res, next) {
                 ]
             }
         }).then(async businesses => {
-            res.status(200).json(businesses);
+            let newBusinessList = []
+            for (const business of businesses) {
+                await findReviewsByBusinessId(business.id).then(async reviews => {
+                    await getRate(reviews).then(async rate => {
+                        business.dataValues.rate = rate;
+                    })
+                    business.dataValues.reviews = reviews;
+                    newBusinessList.push(business)
+                });
+            }
+            res.status(200).json(newBusinessList);
         })
     } catch (error) {
         res.status(400).json({error: error.toString()});
