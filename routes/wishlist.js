@@ -6,22 +6,26 @@ const {WishList} = require("../sync");
 const router = express.Router();
 
 router.get('/', checkToken, async function (req, res, next) {
-    const userId = decodeJWT(req.header.token).sub;
-    WishList.findAll({
-        where: {
-            userId
-        }
-    }).then(async wishlists => {
-        let businesses = []
-        if (wishlists.length > 0) {
-            for (const wishlist of wishlists) {
-                await getBusinessById(wishlist.dataValues.businessId)
-                    .then(async business => businesses.push(business.dataValues))
-                    .catch(e => res.status(400).json({error: e.toString()}))
+    try {
+        const userId = decodeJWT(req.header.token).sub;
+        WishList.findAll({
+            where: {
+                userId
             }
-            res.status(200).json(businesses);
-        } else res.status(200).json(businesses);
-    }).catch(e => res.status(400).json({error: e.toString()}))
+        }).then(async wishlists => {
+            let businesses = []
+            if (wishlists.length > 0) {
+                for (const wishlist of wishlists) {
+                    await getBusinessById(wishlist.dataValues.businessId)
+                        .then(async business => businesses.push(business.dataValues))
+                        .catch(e => res.status(400).json({error: e.toString()}))
+                }
+                res.status(200).json(businesses);
+            } else res.status(200).json(businesses);
+        }).catch(e => res.status(400).json({error: e.toString()}))
+    } catch (e) {
+        res.status(400).json({error: e.toString()});
+    }
 });
 
 router.post('/', checkToken, async function (req, res, next) {
