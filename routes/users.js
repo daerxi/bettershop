@@ -66,17 +66,19 @@ router.post('/login', async (req, res) => {
     }
 });
 
-router.get('/me', checkToken, function (req, res, next) {
+router.get('/me', checkToken, async function (req, res, next) {
     const userId = decodeJWT(req.header.token).sub;
-    findUserByUserId(userId).then(user => {
+    await findUserByUserId(userId).then(user => {
         user = deleteSensitiveInfo(user);
         if (user.isBusiness) getBusiness(user.id)
             .then(async business => {
                 user.dataValues.business = business.dataValues;
-                res.status(201).json(user);
+                res.status(200).json(user);
             })
             .catch(e => res.status(400).json({error: e.toString()}));
-        else res.status(201).json(user);
+        else {
+            res.status(200).json(user);
+        }
     }).catch(e => res.status(400).json({error: e.toString()}));
 });
 
@@ -141,11 +143,16 @@ router.delete('/logout', checkToken, async (req, res) => {
         });
 });
 
-router.get('/:id', function (req, res, next) {
-    findUserByUserId(req.params.id).then(user => {
+router.get('/:id', async function (req, res, next) {
+    await findUserByUserId(req.params.id).then(async user => {
         if (user) {
             user = getInsensitiveInfo(user);
-            res.status(201).json(user);
+            await getReviewsByUserId(req.params.id).then(async reviews => {
+                user.reviews = reviews;
+                res.status(200).json(user);
+            }).catch(e => {
+                res.status(400).json({error: e.toString()})
+            });
         } else {
             res.status(404).json({error: "Not found"});
         }
