@@ -15,14 +15,28 @@ const getRate = async reviews => {
 }
 
 const findReviewsByBusinessId = async businessId => {
-    return await Review.findAll({
+    return Review.findAll({
         where: {
             businessId
         },
         order: [
             ['updatedAt', 'DESC']
         ]
-    })
+    });
+}
+
+async function getNewBusinessList(businesses, res) {
+    let newBusinessList = []
+    for (const business of businesses) {
+        await findReviewsByBusinessId(business.id).then(async reviews => {
+            await getRate(reviews).then(async rate => {
+                business.dataValues.rate = rate;
+            })
+            business.dataValues.reviews = reviews;
+            newBusinessList.push(business)
+        });
+    }
+    res.status(200).json(newBusinessList);
 }
 
 router.get('/', async function (req, res, next) {
@@ -34,17 +48,7 @@ router.get('/', async function (req, res, next) {
                 ]
             }
         ).then(async businesses => {
-            let newBusinessList = []
-            for (const business of businesses) {
-                await findReviewsByBusinessId(business.id).then(async reviews => {
-                    await getRate(reviews).then(async rate => {
-                        business.dataValues.rate = rate;
-                    })
-                    business.dataValues.reviews = reviews;
-                    newBusinessList.push(business)
-                });
-            }
-            res.status(200).json(newBusinessList);
+            return await getNewBusinessList(businesses, res);
         });
     } catch (error) {
         res.status(400).json({error: error.toString()});
@@ -61,17 +65,7 @@ router.get('/categories/:type', async function (req, res, next) {
                 ['clicktrack', 'DESC']
             ]
         }).then(async businesses => {
-            let newBusinessList = []
-            for (const business of businesses) {
-                await findReviewsByBusinessId(business.id).then(async reviews => {
-                    await getRate(reviews).then(async rate => {
-                        business.dataValues.rate = rate;
-                    })
-                    business.dataValues.reviews = reviews;
-                    newBusinessList.push(business)
-                });
-            }
-            res.status(200).json(newBusinessList);
+            return await getNewBusinessList(businesses, res);
         });
     } catch (error) {
         res.status(400).json({error: error.toString()});
@@ -167,17 +161,7 @@ router.get('/search', async function (req, res, next) {
                 ]
             }
         }).then(async businesses => {
-            let newBusinessList = []
-            for (const business of businesses) {
-                await findReviewsByBusinessId(business.id).then(async reviews => {
-                    await getRate(reviews).then(async rate => {
-                        business.dataValues.rate = rate;
-                    })
-                    business.dataValues.reviews = reviews;
-                    newBusinessList.push(business)
-                });
-            }
-            res.status(200).json(newBusinessList);
+            return await getNewBusinessList(businesses, res);
         })
     } catch (error) {
         res.status(400).json({error: error.toString()});
