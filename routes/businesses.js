@@ -39,7 +39,7 @@ async function getNewBusinessList(businesses, res) {
     res.status(200).json(newBusinessList);
 }
 
-router.get('/', async function (req, res, next) {
+router.get('/', async function (req, res) {
     try {
         await Business.findAll(
             {
@@ -55,7 +55,7 @@ router.get('/', async function (req, res, next) {
     }
 });
 
-router.get('/categories/:type', async function (req, res, next) {
+router.get('/categories/:type', async function (req, res) {
     try {
         await Business.findAll({
             where: {
@@ -72,7 +72,7 @@ router.get('/categories/:type', async function (req, res, next) {
     }
 });
 
-router.get('/info', checkToken, async function (req, res, next) {
+router.get('/info', checkToken, async function (req, res) {
     try {
         const getBus = (get, param) => {
             get(param).then(async business => {
@@ -106,7 +106,7 @@ router.get('/info', checkToken, async function (req, res, next) {
     }
 });
 
-router.put('/info', checkToken, async function (req, res, next) {
+router.put('/info', checkToken, async function (req, res) {
     try {
         const userId = decodeJWT(req.header.token).sub;
         updateBusiness(req.body, userId).then(business => {
@@ -117,7 +117,7 @@ router.put('/info', checkToken, async function (req, res, next) {
     }
 });
 
-router.get('/search', async function (req, res, next) {
+router.get('/search', async function (req, res) {
     try {
         const keyword = "%" + req.query.keyword + "%";
         await Business.findAll({
@@ -168,7 +168,7 @@ router.get('/search', async function (req, res, next) {
     }
 });
 
-router.get('/:businessId/reviews', async function (req, res, next) {
+router.get('/:businessId/reviews', async function (req, res) {
     try {
         Review.findAll({
             where: {
@@ -190,7 +190,7 @@ router.get('/:businessId/reviews', async function (req, res, next) {
     }
 });
 
-router.put('/:businessId/click', async function (req, res, next) {
+router.put('/:businessId/click', async function (req, res) {
     try {
         getBusinessById(req.params.businessId).then(async business => {
             if (!business) {
@@ -209,7 +209,7 @@ router.put('/:businessId/click', async function (req, res, next) {
     }
 });
 
-router.post('/:businessId/reviews', checkToken, async function (req, res, next) {
+router.post('/:businessId/reviews', checkToken, async function (req, res) {
     try {
         const userId = decodeJWT(req.header.token).sub;
         Business.findOne({
