@@ -1,4 +1,5 @@
 const express = require('express');
+const {findUserByUserId} = require("../controllers/users");
 const {Op} = require("sequelize");
 const {updateBusiness, getBusiness, getBusinessById} = require("../controllers/businesses");
 const {decodeJWT, checkToken} = require("../controllers/auth");
@@ -31,6 +32,9 @@ async function getNewBusinessList(businesses, res) {
         await findReviewsByBusinessId(business.id).then(async reviews => {
             await getRate(reviews).then(async rate => {
                 business.dataValues.rate = rate;
+            })
+            await findUserByUserId(business.userId).then(async user => {
+                business.dataValues.user = user;
             })
             business.dataValues.reviews = reviews;
             newBusinessList.push(business)
@@ -86,6 +90,9 @@ router.get('/info', checkToken, async function (req, res) {
 
                         business.dataValues.rate = rate;
                         business.dataValues.reviews = reviews;
+                        await findUserByUserId(business.userId).then(async user => {
+                            business.dataValues.user = user;
+                        })
                         res.status(200).json(business);
                     });
                 } else res.status(404).json({error: "Business not found"});
