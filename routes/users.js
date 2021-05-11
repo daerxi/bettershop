@@ -1,6 +1,4 @@
 const express = require('express');
-const {getBusiness} = require("../controllers/businesses");
-const {getReviewsByUserId} = require("../controllers/users");
 const {checkToken, decodeJWT} = require("../controllers/auth");
 const {User} = require("../sync");
 const {
@@ -14,13 +12,15 @@ const {
     updateProfile,
     refreshToken,
     generateVerificationCode,
-    findUserByVerificationCode
+    findUserByVerificationCode,
+    getReviewsByUserId,
+    getWishListByUserId
 } = require("../controllers/users");
-const {createBusiness} = require("../controllers/businesses");
+const {createBusiness, getBusiness} = require("../controllers/businesses");
 const {isNullOrEmpty, deleteSensitiveInfo, getInsensitiveInfo} = require("../common/utils");
 const router = express.Router();
 
-router.get('/', function (req, res, next) {
+router.get('/', function (req, res) {
     try {
         User.findAll().then(async users => {
             res.status(200).send(users);
@@ -66,7 +66,7 @@ router.post('/login', async (req, res) => {
     }
 });
 
-router.get('/me', checkToken, async function (req, res, next) {
+router.get('/me', checkToken, async function (req, res) {
     const userId = decodeJWT(req.header.token).sub;
     await findUserByUserId(userId).then(user => {
         user = deleteSensitiveInfo(user);
@@ -82,7 +82,7 @@ router.get('/me', checkToken, async function (req, res, next) {
     }).catch(e => res.status(400).json({error: e.toString()}));
 });
 
-router.get('/refresh', function (req, res, next) {
+router.get('/refresh', function (req, res) {
     try {
         const token = req.query.refreshToken;
         return refreshToken(token, res);
@@ -143,16 +143,19 @@ router.delete('/logout', checkToken, async (req, res) => {
         });
 });
 
-router.get('/:id', async function (req, res, next) {
+router.get('/:id', async function (req, res) {
     await findUserByUserId(req.params.id).then(async user => {
         if (user) {
             user = getInsensitiveInfo(user);
-            await getReviewsByUserId(req.params.id).then(async reviews => {
-                user.reviews = reviews;
-                res.status(200).json(user);
-            }).catch(e => {
-                res.status(400).json({error: e.toString()})
-            });
+            if (!user.isBusiness) {
+                await getReviewsByUserId(req.params.id).then(async reviews => {
+                    user.reviews = reviews;
+                });
+                await getWishListByUserId(user.id).then(async wishlist => {
+                    user.wishlist = wishlist;
+                });
+            }
+            res.status(200).json(user);
         } else {
             res.status(404).json({error: "Not found"});
         }

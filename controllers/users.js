@@ -2,7 +2,7 @@ const bcrypt = require("bcrypt");
 const {Op} = require("sequelize");
 const {randomString} = require("../common/utils");
 const {signToken} = require("./auth");
-const {User, UserToken, Review} = require("../sync");
+const {User, UserToken, Review, WishList} = require("../sync");
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
@@ -159,6 +159,14 @@ const getReviewsByUserId = async (userId) => {
     });
 }
 
+const getWishListByUserId = async (userId) => {
+    return WishList.findAll({
+        where: {
+            userId
+        }
+    });
+}
+
 module.exports = {
     login,
     createUser,
@@ -171,5 +179,6 @@ module.exports = {
     getReviewsByUserId,
     refreshToken,
     generateVerificationCode,
-    findUserByVerificationCode
+    findUserByVerificationCode,
+    getWishListByUserId
 }

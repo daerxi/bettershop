@@ -1,4 +1,5 @@
 const express = require('express');
+const {getWishListByUserId} = require("../controllers/users");
 const {Op} = require("sequelize");
 const {getBusinessById} = require("../controllers/businesses");
 const {decodeJWT, checkToken} = require("../controllers/auth");
@@ -8,11 +9,7 @@ const router = express.Router();
 router.get('/', checkToken, async function (req, res, next) {
     try {
         const userId = decodeJWT(req.header.token).sub;
-        WishList.findAll({
-            where: {
-                userId
-            }
-        }).then(async wishlists => {
+        await getWishListByUserId(userId).then(async wishlists => {
             let businesses = []
             if (wishlists.length > 0) {
                 for (const wishlist of wishlists) {
