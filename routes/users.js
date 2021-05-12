@@ -134,6 +134,18 @@ router.put('/resetPassword', checkToken, async (req, res) => {
     });
 });
 
+router.put('/profile', checkToken, async (req, res) => {
+    const userId = decodeJWT(req.header.token).sub;
+    await updateProfile(userId, req.body.email, {
+        userName: req.body.userName,
+        avatar: req.body.avatar
+    }).then(async () => {
+        res.status(200).json({success: true});
+    }).catch(e => {
+        res.status(400).json({error: "Update failed.", reason: e.toString()})
+    });
+});
+
 
 router.delete('/logout', checkToken, async (req, res) => {
     const userId = decodeJWT(req.header.token).sub;
