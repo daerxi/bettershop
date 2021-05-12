@@ -1,7 +1,7 @@
 const express = require('express');
-const {getWishListByUserId} = require("../controllers/users");
+const {findReviewsByBusinessId, getRate, getBusinessById} = require("../controllers/businesses");
+const {getWishListByUserId, findUserByUserId} = require("../controllers/users");
 const {Op} = require("sequelize");
-const {getBusinessById} = require("../controllers/businesses");
 const {decodeJWT, checkToken} = require("../controllers/auth");
 const {WishList} = require("../sync");
 const router = express.Router();
@@ -12,9 +12,20 @@ router.get('/', checkToken, async function (req, res, next) {
         await getWishListByUserId(userId).then(async wishlists => {
             let businesses = []
             if (wishlists.length > 0) {
+                let businesses = []
                 for (const wishlist of wishlists) {
                     await getBusinessById(wishlist.dataValues.businessId)
-                        .then(async business => businesses.push(business.dataValues))
+                        .then(async business => {
+                            await findReviewsByBusinessId(business.id).then(async reviews => {
+                                await getRate(reviews).then(async rate => {
+                                    business.dataValues.rate = rate;
+                                });
+                                await findUserByUserId(business.userId).then(async user => {
+                                    business.dataValues.user = user;
+                                });
+                                businesses.push(business);
+                            });
+                        })
                         .catch(e => res.status(400).json({error: e.toString()}))
                 }
                 res.status(200).json(businesses);

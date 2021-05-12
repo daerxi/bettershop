@@ -1,47 +1,18 @@
 const express = require('express');
 const {findUserByUserId} = require("../controllers/users");
 const {Op} = require("sequelize");
-const {updateBusiness, getBusiness, getBusinessById} = require("../controllers/businesses");
+const {
+    updateBusiness,
+    getBusiness,
+    getBusinessById,
+    findReviewsByBusinessId,
+    getNewBusinessList,
+    getRate
+} = require("../controllers/businesses");
 const {decodeJWT, checkToken} = require("../controllers/auth");
 const {isNullOrEmpty} = require("../common/utils");
 const {Business, Review} = require("../sync");
 const router = express.Router();
-
-const getRate = async reviews => {
-    let rate = 0;
-    for (const review of reviews) {
-        rate += review.rate;
-    }
-    return parseInt(rate / reviews.length);
-}
-
-const findReviewsByBusinessId = async businessId => {
-    return Review.findAll({
-        where: {
-            businessId
-        },
-        order: [
-            ['updatedAt', 'DESC']
-        ]
-    });
-}
-
-async function getNewBusinessList(businesses, res) {
-    let newBusinessList = []
-    for (const business of businesses) {
-        await findReviewsByBusinessId(business.id).then(async reviews => {
-            await getRate(reviews).then(async rate => {
-                business.dataValues.rate = rate;
-            })
-            await findUserByUserId(business.userId).then(async user => {
-                business.dataValues.user = user;
-            })
-            business.dataValues.reviews = reviews;
-            newBusinessList.push(business)
-        });
-    }
-    res.status(200).json(newBusinessList);
-}
 
 router.get('/', async function (req, res) {
     try {
@@ -82,17 +53,13 @@ router.get('/info', checkToken, async function (req, res) {
             get(param).then(async business => {
                 if (business) {
                     await findReviewsByBusinessId(business.id).then(async reviews => {
-                        let rate = 0;
-                        for (const review of reviews) {
-                            rate += review.rate;
-                        }
-                        rate = parseInt(rate / reviews.length);
-
-                        business.dataValues.rate = rate;
-                        business.dataValues.reviews = reviews;
+                        await getRate(reviews).then(async rate => {
+                            business.dataValues.rate = rate;
+                            business.dataValues.reviews = reviews;
+                        });
                         await findUserByUserId(business.userId).then(async user => {
                             business.dataValues.user = user;
-                        })
+                        });
                         res.status(200).json(business);
                     });
                 } else res.status(404).json({error: "Business not found"});
