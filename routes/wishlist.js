@@ -69,7 +69,30 @@ router.get('/:businessId', checkToken, async function (req, res, next) {
     } catch (e) {
         res.status(400).json({error: e.toString()});
     }
+});
 
+router.delete('/:businessId', checkToken, async function (req, res, next) {
+    try {
+        const userId = decodeJWT(req.header.token).sub;
+        const businessId = parseInt(req.params.businessId);
+        WishList.destroy({
+            where: {
+                [Op.and]: [
+                    {
+                        userId
+                    },
+                    {
+                        businessId
+                    }
+                ]
+            }
+        }).then(async wishlist => {
+            if (wishlist > 0) res.status(200).json({success: true});
+            else res.status(200).json({success: false});
+        }).catch(e => res.status(400).json({error: e.toString()}));
+    } catch (e) {
+        res.status(400).json({error: e.toString()});
+    }
 });
 
 
