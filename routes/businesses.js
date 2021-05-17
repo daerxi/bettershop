@@ -172,29 +172,42 @@ router.put('/:businessId/click', async function (req, res) {
 
 router.post('/:businessId/reviews', checkToken, async function (req, res) {
     try {
-        if (isNullOrEmpty(req.body.content))
-            throw "Required field cannot be empty.";
+        if (isNullOrEmpty(req.body.content)) throw "Required field cannot be empty.";
         else {
             const userId = decodeJWT(req.header.token).sub;
-            Business.findOne({
+            await Review.create({
+                userId,
+                businessId: req.params.id,
+                content: req.body.content.trim(),
+                rate: req.body.rate
+            }).then(async review => {
+                if (review) res.status(201).json(review);
+                else res.status(400).json({error: "Review not created"});
+            }).catch(e => res.status(400).json({error: e.toString()}));
+        }
+    } catch (error) {
+        res.status(400).json({error: error.toString()});
+    }
+});
+
+router.put('/:businessId/reviews/:reviewId', checkToken, async function (req, res) {
+    try {
+        if (isNullOrEmpty(req.body.content)) throw "Required field cannot be empty.";
+        else {
+            const userId = decodeJWT(req.header.token).sub;
+            await Review.update({
+                userId,
+                businessId: req.params.id,
+                content: req.body.content.trim(),
+                rate: req.body.rate
+            }, {
                 where: {
-                    id: req.params.businessId
+                    id: req.params.reviewId
                 }
-            }).then(async business => {
-                if (business) {
-                    await Review.create({
-                        userId,
-                        businessId: business.id,
-                        content: req.body.content.trim(),
-                        rate: req.body.rate
-                    }).then(async review => {
-                        if (review) res.status(201).json(review)
-                        else res.status(400).json({error: "Review not created"})
-                    }).catch(e => res.status(400).json({error: e.toString()}));
-                } else {
-                    res.status(404).json({error: "Business is not found."});
-                }
-            });
+            }).then(async review => {
+                if (review > 0) res.status(201).json({success: true});
+                else res.status(400).json({error: "Review not updated"});
+            }).catch(e => res.status(400).json({error: e.toString()}));
         }
     } catch (error) {
         res.status(400).json({error: error.toString()});
@@ -203,8 +216,7 @@ router.post('/:businessId/reviews', checkToken, async function (req, res) {
 
 router.post('/:businessId/reviews/:reviewId/replies', checkToken, async function (req, res) {
     try {
-        if (isNullOrEmpty(req.body.content))
-            throw "Required field cannot be empty.";
+        if (isNullOrEmpty(req.body.content)) throw "Required field cannot be empty.";
         else {
             const userId = decodeJWT(req.header.token).sub;
             await Reply.create({
@@ -212,8 +224,10 @@ router.post('/:businessId/reviews/:reviewId/replies', checkToken, async function
                 businessId: req.params.businessId,
                 reviewId: req.params.reviewId,
                 content: req.body.content.trim()
-            }).then(async reply => res.status(201).json(reply)
-            ).catch(e => res.status(400).json({error: e.toString()}));
+            }).then(async reply => {
+                if(reply) res.status(201).json(reply);
+                else res.status(400).json({error: "Update failed"});
+            }).catch(e => res.status(400).json({error: e.toString()}));
         }
     } catch
         (error) {
