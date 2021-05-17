@@ -1,6 +1,5 @@
 const {findUserByUserId} = require("./users");
-const {Review} = require("../sync");
-const {Business} = require("../sync");
+const {Business, Reply, Review} = require("../sync");
 
 const createBusiness = async (name, userId) => {
     return await Business.create({
@@ -52,6 +51,14 @@ const findReviewsByBusinessId = async businessId => {
     });
 }
 
+const findRepliesByReviewId = async reviewId => {
+    return Reply.findOne({
+        where: {
+            reviewId
+        }
+    });
+}
+
 async function getNewBusinessList(businesses, res) {
     let newBusinessList = []
     for (const business of businesses) {
@@ -63,7 +70,7 @@ async function getNewBusinessList(businesses, res) {
                 business.dataValues.user = user;
             })
             business.dataValues.reviews = reviews;
-            newBusinessList.push(business)
+            newBusinessList.push(business);
         });
     }
     res.status(200).json(newBusinessList);
@@ -76,5 +83,6 @@ module.exports = {
     getBusinessById,
     findReviewsByBusinessId,
     getRate,
-    getNewBusinessList
+    getNewBusinessList,
+    findRepliesByReviewId
 }

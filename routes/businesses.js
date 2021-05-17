@@ -7,7 +7,8 @@ const {
     getBusinessById,
     findReviewsByBusinessId,
     getNewBusinessList,
-    getRate
+    getRate,
+    findRepliesByReviewId
 } = require("../controllers/businesses");
 const {decodeJWT, checkToken} = require("../controllers/auth");
 const {isNullOrEmpty} = require("../common/utils");
@@ -55,7 +56,17 @@ router.get('/info', checkToken, async function (req, res) {
                     await findReviewsByBusinessId(business.id).then(async reviews => {
                         await getRate(reviews).then(async rate => {
                             business.dataValues.rate = rate;
-                            business.dataValues.reviews = reviews;
+                            let newReviews = [];
+                            for (const review of reviews) {
+                                console.log(review.id)
+                                await findRepliesByReviewId(review.id)
+                                    .then(async reply => {
+                                        review.dataValues.reply = reply;
+                                        console.log("***", reply);
+                                    })
+                                newReviews.push(review);
+                            }
+                            business.dataValues.reviews = newReviews;
                         });
                         await findUserByUserId(business.userId).then(async user => {
                             business.dataValues.user = user;
@@ -178,8 +189,10 @@ router.post('/:businessId/reviews', checkToken, async function (req, res) {
                         businessId: business.id,
                         content: req.body.content.trim(),
                         rate: req.body.rate
-                    }).then(async review => res.status(201).json(review)
-                    ).catch(e => res.status(400).json({error: e.toString()}));
+                    }).then(async review => {
+                        if (review) res.status(201).json(review)
+                        else res.status(400).json({error: "Review not created"})
+                    }).catch(e => res.status(400).json({error: e.toString()}));
                 } else {
                     res.status(404).json({error: "Business is not found."});
                 }
