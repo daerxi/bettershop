@@ -11,7 +11,7 @@ const {
 } = require("../controllers/businesses");
 const {decodeJWT, checkToken} = require("../controllers/auth");
 const {isNullOrEmpty} = require("../common/utils");
-const {Business, Review} = require("../sync");
+const {Business, Review, Reply} = require("../sync");
 const router = express.Router();
 
 router.get('/', async function (req, res) {
@@ -163,27 +163,69 @@ router.put('/:businessId/click', async function (req, res) {
 
 router.post('/:businessId/reviews', checkToken, async function (req, res) {
     try {
-        const userId = decodeJWT(req.header.token).sub;
-        Business.findOne({
-            where: {
-                id: req.params.businessId
-            }
-        }).then(async business => {
-            if (business) {
-                await Review.create({
-                    userId,
-                    businessId: business.id,
-                    content: req.body.content.trim(),
-                    rate: req.body.rate
-                }).then(async review => {
-                    res.status(201).json(review);
-                }).catch(e => {
-                    res.status(400).json({error: e.toString()})
-                });
-            } else {
-                res.status(404).json({error: "Business is not found."});
-            }
-        });
+        if (isNullOrEmpty(req.body.content))
+            throw "Required field cannot be empty.";
+        else {
+            const userId = decodeJWT(req.header.token).sub;
+            Business.findOne({
+                where: {
+                    id: req.params.businessId
+                }
+            }).then(async business => {
+                if (business) {
+                    await Review.create({
+                        userId,
+                        businessId: business.id,
+                        content: req.body.content.trim(),
+                        rate: req.body.rate
+                    }).then(async review => {
+                        res.status(201).json(review);
+                    }).catch(e => {
+                        res.status(400).json({error: e.toString()})
+                    });
+                } else {
+                    res.status(404).json({error: "Business is not found."});
+                }
+            });
+        }
+    } catch (error) {
+        res.status(400).json({error: error.toString()});
+    }
+});
+
+router.post('/:businessId/reviews/:reviewId/replies', checkToken, async function (req, res) {
+    try {
+        if (isNullOrEmpty(req.body.content))
+            throw "Required field cannot be empty.";
+        else {
+            const userId = decodeJWT(req.header.token).sub;
+            Business.findOne({
+                where: {
+                    id: req.params.businessId
+                }
+            }).then(async business => {
+                if (business) {
+                    await Review.findOne({
+                        id: req.params.reviewId
+                    }).then(async review => {
+                        if (review) {
+                            await Reply.create({
+                                userId,
+                                businessId: business.id,
+                                reviewId: review.id,
+                                content: req.body.content.trim()
+                            });
+                        } else {
+                            res.status(404).json({error: "Review is not found."});
+                        }
+                    }).catch(e => {
+                        res.status(400).json({error: e.toString()})
+                    });
+                } else {
+                    res.status(404).json({error: "Business is not found."});
+                }
+            });
+        }
     } catch (error) {
         res.status(400).json({error: error.toString()});
     }
