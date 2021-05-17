@@ -58,11 +58,9 @@ router.get('/info', checkToken, async function (req, res) {
                             business.dataValues.rate = rate;
                             let newReviews = [];
                             for (const review of reviews) {
-                                console.log(review.id)
                                 await findRepliesByReviewId(review.id)
                                     .then(async reply => {
                                         review.dataValues.reply = reply;
-                                        console.log("***", reply);
                                     })
                                 newReviews.push(review);
                             }
@@ -209,35 +207,16 @@ router.post('/:businessId/reviews/:reviewId/replies', checkToken, async function
             throw "Required field cannot be empty.";
         else {
             const userId = decodeJWT(req.header.token).sub;
-            Business.findOne({
-                where: {
-                    id: req.params.businessId
-                }
-            }).then(async business => {
-                if (business) {
-                    await Review.findOne({
-                        id: req.params.reviewId
-                    }).then(async review => {
-                        if (review) {
-                            await Reply.create({
-                                userId,
-                                businessId: business.id,
-                                reviewId: review.id,
-                                content: req.body.content.trim()
-                            }).then(async reply => res.status(201).json(reply)
-                            ).catch(e => res.status(400).json({error: e.toString()}));
-                        } else {
-                            res.status(404).json({error: "Review is not found."});
-                        }
-                    }).catch(e => {
-                        res.status(400).json({error: e.toString()})
-                    });
-                } else {
-                    res.status(404).json({error: "Business is not found."});
-                }
-            });
+            await Reply.create({
+                userId,
+                businessId: req.params.businessId,
+                reviewId: req.params.reviewId,
+                content: req.body.content.trim()
+            }).then(async reply => res.status(201).json(reply)
+            ).catch(e => res.status(400).json({error: e.toString()}));
         }
-    } catch (error) {
+    } catch
+        (error) {
         res.status(400).json({error: error.toString()});
     }
 });
