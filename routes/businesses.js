@@ -178,11 +178,8 @@ router.post('/:businessId/reviews', checkToken, async function (req, res) {
                         businessId: business.id,
                         content: req.body.content.trim(),
                         rate: req.body.rate
-                    }).then(async review => {
-                        res.status(201).json(review);
-                    }).catch(e => {
-                        res.status(400).json({error: e.toString()})
-                    });
+                    }).then(async review => res.status(201).json(review)
+                    ).catch(e => res.status(400).json({error: e.toString()}));
                 } else {
                     res.status(404).json({error: "Business is not found."});
                 }
@@ -214,7 +211,8 @@ router.post('/:businessId/reviews/:reviewId/replies', checkToken, async function
                                 businessId: business.id,
                                 reviewId: review.id,
                                 content: req.body.content.trim()
-                            });
+                            }).then(async reply => res.status(201).json(reply)
+                            ).catch(e => res.status(400).json({error: e.toString()}));
                         } else {
                             res.status(404).json({error: "Review is not found."});
                         }
