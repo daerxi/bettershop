@@ -14,7 +14,8 @@ const {
     generateVerificationCode,
     findUserByVerificationCode,
     getReviewsByUserId,
-    getWishListByUserId
+    getWishListByUserId,
+    loginWithGoogle
 } = require("../controllers/users");
 const {createBusiness, getBusiness} = require("../controllers/businesses");
 const {isNullOrEmpty, deleteSensitiveInfo, getInsensitiveInfo} = require("../common/utils");
@@ -66,6 +67,16 @@ router.post('/login', async (req, res) => {
     }
 });
 
+router.post('/login2', async (req, res) => {
+    if (isNullOrEmpty(req.body.token)) {
+        res.status(400).json({error: "Google sign in failed."});
+    } else {
+        return await loginWithGoogle(req.body.token, res).catch(e => {
+            res.status(400).json({error: "Bad Request", reason: e.toString()})
+        });
+    }
+});
+
 router.get('/me', checkToken, async function (req, res) {
     const userId = decodeJWT(req.header.token).sub;
     await findUserByUserId(userId).then(user => {
@@ -106,7 +117,7 @@ router.post('/verify', async (req, res) => {
         const verificationCode = req.body.verificationCode;
         await findUserByVerificationCode(verificationCode).then(async user => {
             if (user) {
-                await updateProfile(user.id, req.body.email,{
+                await updateProfile(user.id, req.body.email, {
                     verificationCode: null,
                     active: true
                 }).then(async () => {

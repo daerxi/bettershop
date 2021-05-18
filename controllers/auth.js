@@ -4,9 +4,10 @@ const moment = require("moment");
 
 async function tokenResult(token, res, next) {
     try {
+        if (token.dataValues) token = token.dataValues.token
         if (!token) return res.status(401).json({error: "Not authorized"});
         else {
-            if (decodeJWT(token.dataValues.token).exp >= moment().unix()) next();
+            if (decodeJWT(token).exp >= moment().unix()) next();
             else return res.status(401).json({error: "Token expired"});
         }
     } catch (e) {
@@ -60,5 +61,6 @@ const signToken = (id, time = 30, unit = 'minutes') => {
 module.exports = {
     checkToken,
     signToken,
-    decodeJWT
+    decodeJWT,
+    tokenResult
 }

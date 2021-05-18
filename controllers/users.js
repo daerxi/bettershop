@@ -1,18 +1,19 @@
 const bcrypt = require("bcrypt");
 const {Op} = require("sequelize");
 const {randomString} = require("../common/utils");
-const {signToken} = require("./auth");
+const {signToken, decodeJWT, tokenResult} = require("./auth");
 const {User, UserToken, Review, WishList} = require("../sync");
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-const createUser = async (userName, email, rawPassword, isBusiness) => {
+const createUser = async (userName, email, rawPassword, isBusiness, avatar = null) => {
     const password = bcrypt.hashSync(rawPassword, 10);
     return await User.create({
         userName,
         email,
         password,
-        isBusiness
+        isBusiness,
+        avatar
     });
 }
 
@@ -24,6 +25,25 @@ const login = async (email, rawPassword, res) => {
                 return await updateToken(user.id, res);
             } else res.status(401).json({error: "Your password is not correct."});
         } else res.status(404).json({error: "Account does not exist."});
+    });
+}
+
+const loginWithGoogle = async (token, res) => {
+    const decodedJWT = decodeJWT(token);
+    const username = decodedJWT.name;
+    const avatar = decodedJWT.picture;
+    const email = decodedJWT.email;
+    await findUserByEmail(email).then(async user => {
+        if (user) {
+            await tokenResult(token, res, async () => {
+                return await updateToken(user.id, res);
+            });
+        } else {
+            await createUser(username, email, randomString(12), false, avatar).then(async user => {
+                if (user) await updateToken(user.id, res);
+                else return res.status(400).json({error: "Create user from google profile failed."});
+            }).catch(e => res.status(400).json({error: e.toString()}));
+        }
     });
 }
 
@@ -180,5 +200,6 @@ module.exports = {
     refreshToken,
     generateVerificationCode,
     findUserByVerificationCode,
-    getWishListByUserId
+    getWishListByUserId,
+    loginWithGoogle
 }
