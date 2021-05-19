@@ -8,7 +8,8 @@ const {
     findReviewsByBusinessId,
     getNewBusinessList,
     getRate,
-    findRepliesByReviewId
+    findRepliesByReviewId,
+    getBusinessByType
 } = require("../controllers/businesses");
 const {decodeJWT, checkToken} = require("../controllers/auth");
 const {isNullOrEmpty} = require("../common/utils");
@@ -33,14 +34,7 @@ router.get('/', async function (req, res) {
 
 router.get('/categories/:type', async function (req, res) {
     try {
-        await Business.findAll({
-            where: {
-                category: req.params.type
-            },
-            order: [
-                ['clicktrack', 'DESC']
-            ]
-        }).then(async businesses => {
+        await getBusinessByType(req.params.type).then(async businesses => {
             return await getNewBusinessList(businesses, res);
         });
     } catch (error) {

@@ -24,6 +24,17 @@ const getBusiness = async (userId) => {
     });
 }
 
+const getBusinessByType = async (type) => {
+    return Business.findAll({
+        where: {
+            category: type
+        },
+        order: [
+            ['clicktrack', 'DESC']
+        ]
+    });
+}
+
 const getBusinessById = async (id) => {
     return Business.findOne({
         where: {
@@ -79,6 +90,7 @@ async function getNewBusinessList(businesses, res) {
 module.exports = {
     createBusiness,
     getBusiness,
+    getBusinessByType,
     updateBusiness,
     getBusinessById,
     findReviewsByBusinessId,
