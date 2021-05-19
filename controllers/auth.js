@@ -43,7 +43,7 @@ const accessToken = (req) => {
         const bearer = header.split(' ');
         req.header.token = bearer[1];
         if (bearer[0].toLowerCase() === "bearer")
-            if (!bearer[1].trim() || bearer[1].include("null")) return {error: "Empty Token"};
+            if (!bearer[1].trim() || bearer[1] === "null") return {error: "Empty Token"};
             else return bearer[1].trim();
         else return {error: "Invalid Auth Type"};
     } else return {error: "Forbidden"};
