@@ -19,7 +19,11 @@ module.exports = (sequelize, type) => {
             defaultValue: false
         },
         // 1 as business, 0 as normal user
-        isBusiness:  type.BOOLEAN,
+        isBusiness: type.BOOLEAN,
+        admin: {
+            type: type.BOOLEAN,
+            defaultValue: 0
+        },
         avatar: type.TEXT('LONG'),
         verificationCode: type.STRING,
         password: type.STRING
