@@ -21,7 +21,7 @@ const {createBusiness, getBusiness} = require("../controllers/businesses");
 const {isNullOrEmpty, deleteSensitiveInfo, getInsensitiveInfo} = require("../common/utils");
 const router = express.Router();
 
-router.get('/', function (req, res) {
+router.get('/', checkToken, function (req, res) {
     try {
         User.findAll().then(async users => {
             res.status(200).send(users);
