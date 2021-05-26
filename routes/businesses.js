@@ -171,7 +171,7 @@ router.post('/:businessId/reviews', checkToken, async function (req, res) {
             const userId = decodeJWT(req.header.token).sub;
             await Review.create({
                 userId,
-                businessId: req.params.id,
+                businessId: req.params.businessId,
                 content: req.body.content.trim(),
                 rate: req.body.rate
             }).then(async review => {
@@ -191,7 +191,7 @@ router.put('/:businessId/reviews/:reviewId', checkToken, async function (req, re
             const userId = decodeJWT(req.header.token).sub;
             await Review.update({
                 userId,
-                businessId: req.params.id,
+                businessId: req.params.businessId,
                 content: req.body.content.trim(),
                 rate: req.body.rate
             }, {
